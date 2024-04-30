@@ -23,10 +23,10 @@ var (
 )
 
 func LoadKeys() {
-	DispatchKey = readResource(prefix + "/keys/dispatchKey.bin")
-	DispatchSeed = readResource(prefix + "/keys/dispatchSeed.bin")
-	EncryptKey = readResource(prefix + "/keys/secretKey.bin")
-	EncryptSeedBuffer = readResource(prefix + "/keys/secretKeyBuffer.bin")
+	DispatchKey = ReadResource(prefix + "/keys/dispatchKey.bin")
+	DispatchSeed = ReadResource(prefix + "/keys/dispatchSeed.bin")
+	EncryptKey = ReadResource(prefix + "/keys/secretKey.bin")
+	EncryptSeedBuffer = ReadResource(prefix + "/keys/secretKeyBuffer.bin")
 	initCurSigningKey(prefix + "/keys/SigningKey.der")
 	initGameKeys()
 }

@@ -1,41 +1,68 @@
 package auth
 
 import (
-	"Go-Grasscutter/src/database"
+	"Go-Grasscutter/src/game"
 	"Go-Grasscutter/src/server/http/object"
 	"Go-Grasscutter/utils"
-	"context"
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
 )
 
-func PasswordAuthenticator(c context.Context, ctx *app.RequestContext) {
+type AuthenticationRequest struct {
+	Context           *app.RequestContext
+	PasswordRequest   *object.LoginAccountRequestJson
+	TokenRequest      *object.LoginTokenRequestJson
+	SessionKeyRequest *object.ComboTokenReqJson
+	SessionKeyData    *object.LoginTokenData
+}
+
+// PasswordAuthenticator maybe never use
+type PasswordAuthenticator struct {
+}
+
+func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
+	// todo redo
 	var req *object.LoginAccountRequestJson
-	err := ctx.Bind(req)
-	if err != nil {
+	req = request.PasswordRequest
+	if req == nil {
 		log.Fatal("requestData should never be nil")
-		return
+		return nil
 	}
-	address := utils.Address(ctx)
+	address := utils.Address(request.Context)
 	//responseMessage := translate("messages.dispatch.account.username_error")
 	//loggerMessage := ""
 
-	// Get account from database.
-	account := database.GetAccountName(req.Account)
+	// Get account from db.
+	account := game.GetAccountName(req.Account)
 	// todo autoCreate
 	if account == nil {
 		log.Fatal("user not exit, req come from ", address)
-		return
+		return nil
 	}
-	ctx.JSON(200, &object.LoginResultJson{
+	obj := &object.LoginResultJson{
 		Message: "OK",
-		RetCode: 0,
-		Data: object.VerifyData{
+		VerifyData: object.VerifyData{
 			Account: object.VerifyAccountData{
 				UID:   account.ID,
 				Email: account.GetEmail(),
 				Token: account.GenerateSessionKey(),
 			},
 		},
-	})
+	}
+	return obj
 }
+
+type ExperimentalPasswordAuthenticator struct {
+}
+
+//func (a *ExperimentalPasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
+//	// todo 构造后传进来的
+//	var req *object.LoginAccountRequestJson
+//	req := request.PasswordRequest
+//	if req != nil {
+//		log.Fatal("requestData should never be nil")
+//		return nil
+//	}
+//	// todo 解密
+//	key := utils.ReadResource("/keys/auth_private-key.der")
+//}
