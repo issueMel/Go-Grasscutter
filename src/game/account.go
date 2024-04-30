@@ -23,6 +23,11 @@ type Account struct {
 	IsBanned       bool     `bson:"isBanned"`
 }
 
+func (a *Account) SaveAccount() {
+	// todo async store data
+	db.DB.Collection("accounts").InsertOne(context.Background(), a)
+}
+
 func (a *Account) GetEmail() string {
 	if len(a.Email) != 0 {
 		return a.Email
@@ -33,13 +38,15 @@ func (a *Account) GetEmail() string {
 
 func (a *Account) GenerateSessionKey() string {
 	sessionKey := utils.BytesToHex(utils.CreateSessionKey(32))
-	// save in db todo
+	// save in db
+	a.SaveAccount()
 	return sessionKey
 }
 
 func (a *Account) GenerateLoginToken() string {
 	token := utils.BytesToHex(utils.CreateSessionKey(32))
-	// save in db todo
+	// save in db
+	a.SaveAccount()
 	return token
 }
 
