@@ -37,6 +37,12 @@ func (a *Account) GenerateSessionKey() string {
 	return sessionKey
 }
 
+func (a *Account) GenerateLoginToken() string {
+	token := utils.BytesToHex(utils.CreateSessionKey(32))
+	// save in db todo
+	return token
+}
+
 func (a *Account) GetAccount() *Account {
 	if a == nil {
 		return GetAccountById(a.ID)

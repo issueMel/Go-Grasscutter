@@ -14,13 +14,14 @@ import (
 var r *server.Hertz
 
 func InitRouter() *server.Hertz {
-	// https://www.cloudwego.io/zh/docs/hertz/reference/config/
 	r = server.Default(server.WithHostPorts(":8080"))
 
 	r.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusOK, utils.H{"message": "pong"})
 	})
-	handler.GetAnnouncement(r)
+	handler.ApplyAnnouncementHandler(r)
+	handler.ApplyGenericHandler(r)
+	handler.ApplyLogRoutes(r)
 	return r
 }
 
@@ -33,10 +34,11 @@ func GetRouter() *server.Hertz {
 
 func ProxyNoRouteRequest(url string) {
 	// initialize a reverse proxy and pass the actual backend server url here
-	// 初始化反向代理并传入真正后端服务的地址
 	proxy, err := reverseproxy.NewSingleHostReverseProxy(url)
 	r.NoRoute(func(c context.Context, ctx *app.RequestContext) {
 		fmt.Println(ctx.URI())
+		body, _ := ctx.Body()
+		fmt.Println(string(body))
 		proxy.ServeHTTP(c, ctx)
 	})
 	if err != nil {
