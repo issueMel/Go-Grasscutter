@@ -28,15 +28,15 @@ func LoadKeys() {
 }
 
 func initCurSigningKey(resourcePath string) {
-	// 读取DER格式的私钥文件
+	// Read private key files in DER format
 	derBytes := ReadResource(resourcePath)
-	// 解析私钥
+	// Parse private key
 	privateKey, err := x509.ParsePKCS8PrivateKey(derBytes)
 	if err != nil {
 		log.Println("Error:", err)
 	}
 	ok := true
-	// 转换为RSA私钥类型
+	// Convert to RSA private key type
 	CurSigningKey, ok = privateKey.(*rsa.PrivateKey)
 	if !ok {
 		log.Println("Error:", err)
@@ -56,14 +56,7 @@ func initGameKeys() {
 		}
 		m := pattern.FindStringSubmatch(file.Name())
 		if len(m) > 1 {
-			// filePath := filepath.Join("resources/keys/game_keys/", file.Name())
-			// filepath.Join() give wrong path in Windows with embed
-			filePath := "resources/keys/game_keys/" + file.Name()
-			keyBytes, err := r.ReadFile(filePath)
-			if err != nil {
-				log.Println("Error reading file:", err)
-				continue
-			}
+			keyBytes := ReadResource(file.Name())
 			key, err := x509.ParsePKIXPublicKey(keyBytes)
 			if err != nil {
 				log.Println("Error parsing public key:", err)
