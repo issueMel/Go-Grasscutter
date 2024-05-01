@@ -5,13 +5,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"log"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strconv"
 )
-
-const prefix = "D:/IdeaProjects/Go-Grasscutter/resources"
 
 var (
 	DispatchKey       []byte
@@ -23,20 +19,17 @@ var (
 )
 
 func LoadKeys() {
-	DispatchKey = ReadResource(prefix + "/keys/dispatchKey.bin")
-	DispatchSeed = ReadResource(prefix + "/keys/dispatchSeed.bin")
-	EncryptKey = ReadResource(prefix + "/keys/secretKey.bin")
-	EncryptSeedBuffer = ReadResource(prefix + "/keys/secretKeyBuffer.bin")
-	initCurSigningKey(prefix + "/keys/SigningKey.der")
+	DispatchKey = ReadResource("/keys/dispatchKey.bin")
+	DispatchSeed = ReadResource("/keys/dispatchSeed.bin")
+	EncryptKey = ReadResource("/keys/secretKey.bin")
+	EncryptSeedBuffer = ReadResource("/keys/secretKeyBuffer.bin")
+	initCurSigningKey("/keys/SigningKey.der")
 	initGameKeys()
 }
 
 func initCurSigningKey(resourcePath string) {
 	// 读取DER格式的私钥文件
-	derBytes, err := os.ReadFile(resourcePath)
-	if err != nil {
-		log.Println("Error:", err)
-	}
+	derBytes := ReadResource(resourcePath)
 	// 解析私钥
 	privateKey, err := x509.ParsePKCS8PrivateKey(derBytes)
 	if err != nil {
@@ -52,16 +45,21 @@ func initCurSigningKey(resourcePath string) {
 
 func initGameKeys() {
 	pattern := regexp.MustCompile(`([0-9]*)_Pub\.der`)
-	files, err := filepath.Glob(prefix + "/keys/game_keys/*_Pub.der")
+	files, err := r.ReadDir("resources/keys/game_keys")
 	if err != nil {
 		log.Println("Error:", err)
 		return
 	}
-
-	for _, filePath := range files {
-		m := pattern.FindStringSubmatch(filepath.Base(filePath))
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+		m := pattern.FindStringSubmatch(file.Name())
 		if len(m) > 1 {
-			keyBytes, err := os.ReadFile(filePath)
+			// filePath := filepath.Join("resources/keys/game_keys/", file.Name())
+			// filepath.Join() give wrong path in Windows with embed
+			filePath := "resources/keys/game_keys/" + file.Name()
+			keyBytes, err := r.ReadFile(filePath)
 			if err != nil {
 				log.Println("Error reading file:", err)
 				continue
@@ -71,13 +69,11 @@ func initGameKeys() {
 				log.Println("Error parsing public key:", err)
 				continue
 			}
-
 			rsaKey, ok := key.(*rsa.PublicKey)
 			if !ok {
 				log.Println("Key is not an RSA public key")
 				continue
 			}
-
 			id, err := strconv.Atoi(m[1])
 			if err != nil {
 				log.Println("Error converting ID to integer:", err)
