@@ -46,7 +46,8 @@ func initCurSigningKey(resourcePath string) {
 
 func initGameKeys() {
 	pattern := regexp.MustCompile(`([0-9]*)_Pub\.der`)
-	files, err := utils.r.ReadDir("resources/keys/game_keys")
+	r := utils.GetResource()
+	files, err := r.ReadDir("resources/keys/game_keys")
 	if err != nil {
 		log.Println("Error:", err)
 		return
