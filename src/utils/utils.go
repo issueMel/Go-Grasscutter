@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/cloudwego/hertz/pkg/app"
+import (
+	"encoding/base64"
+	"github.com/cloudwego/hertz/pkg/app"
+)
 
 var (
 	HexArray = []rune("0123456789abcdef")
@@ -35,4 +38,8 @@ func BytesToHex(bytes []byte) string {
 		hexChars[i*2+1] = HexArray[val&0x0F]
 	}
 	return string(hexChars)
+}
+
+func Base64Encode(toEncode []byte) string {
+	return base64.StdEncoding.EncodeToString(toEncode)
 }

@@ -1,6 +1,7 @@
-package utils
+package crypto
 
 import (
+	"Go-Grasscutter/src/utils"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -19,17 +20,17 @@ var (
 )
 
 func LoadKeys() {
-	DispatchKey = ReadResource("/keys/dispatchKey.bin")
-	DispatchSeed = ReadResource("/keys/dispatchSeed.bin")
-	EncryptKey = ReadResource("/keys/secretKey.bin")
-	EncryptSeedBuffer = ReadResource("/keys/secretKeyBuffer.bin")
+	DispatchKey = utils.ReadResource("/keys/dispatchKey.bin")
+	DispatchSeed = utils.ReadResource("/keys/dispatchSeed.bin")
+	EncryptKey = utils.ReadResource("/keys/secretKey.bin")
+	EncryptSeedBuffer = utils.ReadResource("/keys/secretKeyBuffer.bin")
 	initCurSigningKey("/keys/SigningKey.der")
 	initGameKeys()
 }
 
 func initCurSigningKey(resourcePath string) {
 	// Read private key files in DER format
-	derBytes := ReadResource(resourcePath)
+	derBytes := utils.ReadResource(resourcePath)
 	// Parse private key
 	privateKey, err := x509.ParsePKCS8PrivateKey(derBytes)
 	if err != nil {
@@ -45,7 +46,7 @@ func initCurSigningKey(resourcePath string) {
 
 func initGameKeys() {
 	pattern := regexp.MustCompile(`([0-9]*)_Pub\.der`)
-	files, err := r.ReadDir("resources/keys/game_keys")
+	files, err := utils.r.ReadDir("resources/keys/game_keys")
 	if err != nil {
 		log.Println("Error:", err)
 		return
@@ -56,7 +57,7 @@ func initGameKeys() {
 		}
 		m := pattern.FindStringSubmatch(file.Name())
 		if len(m) > 1 {
-			keyBytes := ReadResource(file.Name())
+			keyBytes := utils.ReadResource("/keys/game_keys/" + file.Name())
 			key, err := x509.ParsePKIXPublicKey(keyBytes)
 			if err != nil {
 				log.Println("Error parsing public key:", err)
