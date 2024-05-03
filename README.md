@@ -54,12 +54,6 @@ go build Go-Grasscutter/src
 
 ##### Compiling the Handbook (Manually)
 
-With Gradle:
-
-```shell
-./gradlew generateHandbook
-```
-
 With NPM:
 
 ```shell
