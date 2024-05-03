@@ -3,7 +3,7 @@ package auth
 import (
 	"Go-Grasscutter/src/game"
 	"Go-Grasscutter/src/server/http/object"
-	"Go-Grasscutter/utils"
+	"Go-Grasscutter/src/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"log"
 )
@@ -20,8 +20,9 @@ type AuthenticationRequest struct {
 type PasswordAuthenticator struct {
 }
 
+// Authenticate Handles the authentication request from the username and password form.
 func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
-	// todo redo
+	// todo redo if not user exit resp
 	resp := object.NewLoginResultJson()
 	req := request.PasswordRequest
 	if req == nil {
@@ -47,7 +48,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 		resp.Data.Account.Email = account.GetEmail()
 	} else {
 		resp.RetCode = -201
-		resp.Message = "Go-G错误"
+		resp.Message = "Wrong in PasswordAuthenticator()"
 	}
 	return resp
 }
@@ -67,8 +68,7 @@ type ExperimentalPasswordAuthenticator struct {
 //	key := utils.ReadResource("/keys/auth_private-key.der")
 //}
 
-type SessionKeyAuthenticator struct {
-}
+type SessionKeyAuthenticator struct{}
 
 func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	resp := object.NewComboTokenResJson()
@@ -83,20 +83,60 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 	address := utils.Address(request.Context)
 	// Get account from db.
 	account := game.GetAccountById(loginData.UID)
-	if account == nil || account.SessionKey != loginData.Token {
-		log.Println("user not exit, req come from ", address)
-	} else {
-		loginSuccess = true
-	}
-	// todo account.SessionKey != loginData.Token
-	loginSuccess = true
+
+	loginSuccess = account != nil && account.SessionKey == loginData.Token
+
 	if loginSuccess {
 		resp.Message = "OK"
 		resp.Data.ComboID = "157795300"
 		resp.Data.ComboToken = account.GenerateLoginToken()
 	} else {
 		resp.Retcode = -200
-		resp.Message = "Go-G错误"
+		resp.Message = "Wrong in SessionKeyAuthenticator()"
+		log.Println(address)
 	}
 	return resp
+}
+
+type TokenAuthenticator struct {
+}
+
+// Authenticate Handles the authentication request from the game when using a registry token
+func (TokenAuthenticator) Authenticate(request *AuthenticationRequest) any {
+	resp := object.NewLoginResultJson()
+	requestData := request.TokenRequest
+	if requestData == nil {
+		log.Println("requestData should never be nil")
+		return nil
+	}
+	var successfulLogin bool
+	// todo someone go in system
+	//address := utils.Address(request.Context)
+
+	// Get account from database.
+	account := game.GetAccountById(requestData.UID)
+	// Check if account exists/token is valid.
+	successfulLogin = account != nil && account.SessionKey == requestData.Token
+
+	// Set response data.
+	if successfulLogin {
+		resp.Message = "OK"
+		resp.Data.Account.UID = account.ID
+		resp.Data.Account.Token = account.GenerateSessionKey()
+		resp.Data.Account.Email = account.GetEmail()
+	} else {
+		resp.RetCode = -201
+		resp.Message = "Wrong in TokenAuthenticator()"
+
+		// Log the failure.
+	}
+	return resp
+}
+
+type SessionTokenValidator struct {
+}
+
+// todo SessionTokenValidator()
+func (SessionTokenValidator) Authenticate(request *AuthenticationRequest) any {
+	return nil
 }

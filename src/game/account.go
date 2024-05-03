@@ -2,10 +2,10 @@ package game
 
 import (
 	"Go-Grasscutter/src/db"
-	"Go-Grasscutter/utils"
+	utils2 "Go-Grasscutter/src/utils"
+	"Go-Grasscutter/src/utils/crypto"
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
-	"log"
 )
 
 type Account struct {
@@ -25,7 +25,7 @@ type Account struct {
 
 func (a *Account) SaveAccount() {
 	// todo async store data
-	db.DB.Collection("accounts").InsertOne(context.Background(), a)
+	db.DB.Collection("accounts").ReplaceOne(context.Background(), bson.M{"_id": a.ID}, a)
 }
 
 func (a *Account) GetEmail() string {
@@ -37,15 +37,17 @@ func (a *Account) GetEmail() string {
 }
 
 func (a *Account) GenerateSessionKey() string {
-	sessionKey := utils.BytesToHex(utils.CreateSessionKey(32))
+	sessionKey := utils2.BytesToHex(crypto.CreateSessionKey(32))
 	// save in db
+	a.SessionKey = sessionKey
 	a.SaveAccount()
 	return sessionKey
 }
 
 func (a *Account) GenerateLoginToken() string {
-	token := utils.BytesToHex(utils.CreateSessionKey(32))
+	token := utils2.BytesToHex(crypto.CreateSessionKey(32))
 	// save in db
+	a.Token = token
 	a.SaveAccount()
 	return token
 }
@@ -59,11 +61,7 @@ func (a *Account) GetAccount() *Account {
 
 func GetAccountName(username string) *Account {
 	account := &Account{}
-	err := db.DB.Collection("accounts").FindOne(context.Background(), bson.D{{"username", username}}).Decode(account)
-	if err != nil {
-		log.Println(err)
-		return account
-	}
+	db.DB.Collection("accounts").FindOne(context.Background(), bson.D{{"username", username}}).Decode(account)
 	return account
 }
 
