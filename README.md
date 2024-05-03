@@ -1,5 +1,6 @@
 # Go-Grasscutter
-
+[EN](README.md) | [简中](docs/README_zh-CN.md)
+****
 this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutter).
 It only support for version CN 4.0.
 
@@ -29,7 +30,7 @@ It only support for version CN 4.0.
 - Click the gear in the upper right corner
 - Set the game Install path to where your game is located.
 - Leave all other settings on default
-- Open your build program.
+- Open the compiled Golang program
 - Click the launch button.
 - Log in with whatever username you want. Password can be anything.
 
