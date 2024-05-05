@@ -1,9 +1,12 @@
 package main
 
 import (
+	"Go-Grasscutter/src/config"
 	"Go-Grasscutter/src/db"
 	"Go-Grasscutter/src/server/http"
-	"Go-Grasscutter/utils"
+	"Go-Grasscutter/src/server/http/handler"
+	"Go-Grasscutter/src/utils"
+	"Go-Grasscutter/src/utils/crypto"
 	"embed"
 	_ "embed"
 )
@@ -13,7 +16,8 @@ var resource embed.FS
 
 func main() {
 	utils.InitResource(resource)
-	utils.LoadKeys() // Load keys from buffers.
+	config.InitConfig()
+	crypto.LoadKeys() // Load keys from buffers.
 
 	// Parse start-up arguments.
 
@@ -23,6 +27,10 @@ func main() {
 
 	// Initialize db.
 	db.InitDatabase()
+	// test area
+	handler.Initialize()
+
+	// test area
 	// Initialize the default systems.
 	//_ = new(auth.PasswordAuthenticator)
 	//_ = new(command.DefaultPermissionHandler)

@@ -19,6 +19,8 @@ import (
 	"strconv"
 )
 
+// todo change it from uint8 to int8
+
 var (
 	DispatchKey       []byte
 	DispatchSeed      []byte // todo check if race in regionhandler.go:74
@@ -30,7 +32,6 @@ var (
 )
 
 func LoadKeys() {
-
 	DispatchKey = utils.ReadResource("/keys/dispatchKey.bin")
 	DispatchSeed = utils.ReadResource("/keys/dispatchSeed.bin")
 	EncryptKey = utils.ReadResource("/keys/secretKey.bin")
@@ -115,14 +116,13 @@ func EncryptAndSignRegionData(regionInfo []byte, keyID string) (*object.QueryCur
 	if keyID == "" {
 		return nil, errors.New("Key ID was not set")
 	}
-
 	// Get encryption key
 	val, err := strconv.Atoi(keyID)
 	if err != nil {
 		return nil, err
 	}
-	encryptionKey := EncryptionKeys[val]
-	if encryptionKey == nil {
+	encryptionKey, ok := EncryptionKeys[val]
+	if !ok {
 		return nil, errors.New("Encryption key not found")
 	}
 

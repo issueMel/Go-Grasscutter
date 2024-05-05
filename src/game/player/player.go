@@ -2,14 +2,14 @@ package player
 
 import (
 	"Go-Grasscutter/src/game"
-	"time"
+	game2 "Go-Grasscutter/src/server/game"
 )
 
 type Player struct {
-	ID        int    `bson:"_id"`
-	AccountID string `bson:"accountId" index:"unique"`
-	Account   *game.Account
-	//Session            *GameSession       `bson:"-"`
+	ID         int    `bson:"_id"`
+	AccountID  string `bson:"accountId" index:"unique"`
+	Account    *game.Account
+	Session    *game2.GameSession
 	SessionKey string `bson:"-"`
 	Nickname   string `bson:"nickname"`
 	Signature  string `bson:"signature"`
@@ -22,18 +22,22 @@ type Player struct {
 	//Rotation         Position       `bson:"rotation"`
 	Birthday PlayerBirthday `bson:"birthday"`
 	//Codex            PlayerCodex    `bson:"codex"`
-	ShowAvatars      bool        `bson:"showAvatars"`
-	ShowAvatarList   []int       `bson:"showAvatarList"`
-	ShowNameCardList []int       `bson:"showNameCardList"`
-	Properties       map[int]int `bson:"properties"`
-	CurrentRealmID   int         `bson:"currentRealmId"`
-	IsInEditMode     bool        `bson:"-"`
-	WidgetID         int         `bson:"widgetId"`
-	SceneID          int         `bson:"sceneId"`
-	RegionID         int         `bson:"regionId"`
-	MainCharacterID  int         `bson:"mainCharacterId"`
-	InGodMode        bool        `bson:"inGodMode"`
-	UnlimitedStamina bool        `bson:"unlimitedStamina"`
-	CreatedAt        time.Time   `bson:"createdAt"`
-	UpdatedAt        time.Time   `bson:"updatedAt"`
+	ShowAvatars      bool             `bson:"showAvatars"`
+	ShowAvatarList   []int            `bson:"showAvatarList"`
+	ShowNameCardList []int            `bson:"showNameCardList"`
+	Properties       map[int]int      `bson:"properties"`
+	CurrentRealmID   int              `bson:"currentRealmId"`
+	IsInEditMode     bool             `bson:"-"`
+	WidgetID         int              `bson:"widgetId"`
+	SceneID          int              `bson:"sceneId"`
+	RegionID         int              `bson:"regionId"`
+	MainCharacterID  int              `bson:"mainCharacterId"`
+	InGodMode        bool             `bson:"inGodMode"`
+	UnlimitedStamina bool             `bson:"unlimitedStamina"`
+	NameCardList     map[int]struct{} `bson:"nameCardList"`
+	CostumeList      map[int]struct{} `bson:"costumeList"`
+}
+
+func NewPlayer() *Player {
+	return &Player{}
 }

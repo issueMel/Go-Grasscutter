@@ -1,6 +1,7 @@
 # Go-Grasscutter
 [EN](README.md) | [简中](docs/README_zh-CN.md)
 ****
+project is archive. Don`t know how to fix crypto.
 this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutter).
 It only support for version CN 4.0.
 

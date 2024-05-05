@@ -5,7 +5,6 @@ import (
 	"Go-Grasscutter/src/utils"
 	"bytes"
 	_ "embed"
-	"fmt"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -15,8 +14,8 @@ import (
 var config []byte
 
 var (
-	C *Config
-	L *viper.Viper
+	Conf *Config
+	L    *viper.Viper
 )
 
 func InitConfig() {
@@ -40,7 +39,7 @@ func InitConfig() {
 	if err != nil {
 		panic(err)
 	}
-	err = viper.Unmarshal(&C)
+	err = viper.Unmarshal(&Conf)
 	if err != nil {
 		panic(err)
 	}
@@ -50,10 +49,16 @@ func InitConfig() {
 func initLanguage() {
 	L = viper.New()
 	L.AddConfigPath("./")
-	r, err := utils.GetResource().ReadFile(fmt.Sprintf("resources/languages/%s.json", C.Language.Language))
+	prefix := "resources/languages/"
+	// todo fix
+	r, err := utils.GetResource().ReadFile(prefix + Conf.Language.Language + ".json")
 	if err != nil {
 		log.Println(err)
-		r, _ = utils.GetResource().ReadFile("resources/languages/en-US.json")
+		r, err = utils.GetResource().ReadFile(prefix + "zh-CN.json")
+		if err != nil {
+			// en-US.json should exist
+			panic(err)
+		}
 	}
 	if err = L.ReadConfig(bytes.NewBuffer(r)); err != nil {
 		// en-US.json should exist

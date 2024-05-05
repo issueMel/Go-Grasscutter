@@ -1,9 +1,9 @@
 package object
 
 type LoginResultJson struct {
-	Message string     `json:"message"`
-	RetCode int        `json:"retcode"`
-	Data    VerifyData `json:"data"`
+	Message string      `json:"message"`
+	RetCode int         `json:"retcode"`
+	Data    *VerifyData `json:"data"`
 }
 
 type LoginAccountRequestJson struct {
@@ -13,11 +13,11 @@ type LoginAccountRequestJson struct {
 }
 
 type VerifyData struct {
-	Account             VerifyAccountData `json:"account"`
-	DeviceGrantRequired bool              `json:"device_grant_required"`
-	RealNameOperation   string            `json:"realname_operation"`
-	RealPersonRequired  bool              `json:"realperson_required"`
-	SafeMobileRequired  bool              `json:"safe_mobile_required"`
+	Account             *VerifyAccountData `json:"account"`
+	DeviceGrantRequired bool               `json:"device_grant_required"`
+	RealNameOperation   string             `json:"realname_operation"`
+	RealPersonRequired  bool               `json:"realperson_required"`
+	SafeMobileRequired  bool               `json:"safe_mobile_required"`
 }
 
 type VerifyAccountData struct {
@@ -46,8 +46,8 @@ type VerifyAccountData struct {
 func NewLoginResultJson() *LoginResultJson {
 	return &LoginResultJson{
 		RetCode: 0,
-		Data: VerifyData{
-			Account: VerifyAccountData{
+		Data: &VerifyData{
+			Account: &VerifyAccountData{
 				IsEmailVerify: "0",
 				Country:       "US",
 				AreaCode:      "**",
