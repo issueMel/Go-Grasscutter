@@ -88,6 +88,7 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 
 	if loginSuccess {
 		resp.Message = "OK"
+		resp.Data.OpenID = account.ID
 		resp.Data.ComboID = "157795300"
 		resp.Data.ComboToken = account.GenerateLoginToken()
 	} else {
