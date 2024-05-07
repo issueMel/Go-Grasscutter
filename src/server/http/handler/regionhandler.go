@@ -229,11 +229,11 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 	doOnce.Do(func() {
 		Initialize()
 	})
-	fmt.Println(ctx.ClientIP(), "visit QueryCurrentRegion")
+
 	// Get region to query.
 	regionName := ctx.Param("region")
 	versionName := ctx.Query("version")
-	// todo var region = regions.get(regionName);
+
 	// Get region data.
 	regionData := "CAESGE5vdCBGb3VuZCB2ZXJzaW9uIGNvbmZpZw=="
 	val, ok := regions.Load(regionName)
@@ -255,7 +255,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 		(versionMajor == 2 && versionMinor == 8) {
 		event := dispatch.NewQueryCurrentRegionEvent(regionData)
 		// event.call();
-		key_id := ctx.Query("key_id")
+		keyId := ctx.Query("key_id")
 		// The 'fix' or 'patch' version is not checked because it is only used
 		// when miHoYo is desperate and fucks up big time.
 		if versionMajor != consts.VersionParts[0] ||
@@ -296,7 +296,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 			return
 		}
 		regionInfo := utils.Base64Decode(event.RegionInfo)
-		rsp, err := crypto.EncryptAndSignRegionData(regionInfo, key_id)
+		rsp, err := crypto.EncryptAndSignRegionData(regionInfo, keyId)
 		if err != nil {
 			log.Println("An error occurred while handling query_cur_region.", rsp)
 			return
