@@ -38,7 +38,7 @@ func New() *MT19937 {
 
 // Seed uses the given 64bit value to initialise the generator state.
 // This method is part of the rand.Source interface.
-func (mt *MT19937) Seed(seed int64) {
+func (mt *MT19937) Seed(seed uint64) {
 	x := mt.state
 	x[0] = uint64(seed)
 	for i := uint64(1); i < n; i++ {
