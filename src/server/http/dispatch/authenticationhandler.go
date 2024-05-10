@@ -61,5 +61,9 @@ func TokenLogin(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 	// Pass data to authentication handler.
-
+	var ta = new(auth.TokenAuthenticator)
+	resp := ta.Authenticate(&auth.AuthenticationRequest{
+		TokenRequest: req,
+	}).(*object.LoginResultJson)
+	ctx.JSON(200, resp)
 }

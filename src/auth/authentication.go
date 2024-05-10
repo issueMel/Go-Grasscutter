@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"Go-Grasscutter/src/config"
 	"Go-Grasscutter/src/game"
 	"Go-Grasscutter/src/server/http/object"
 	"Go-Grasscutter/src/utils"
@@ -24,23 +25,26 @@ type PasswordAuthenticator struct {
 func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	// todo redo if not user exit resp
 	resp := object.NewLoginResultJson()
-	req := request.PasswordRequest
-	if req == nil {
+
+	requestData := request.PasswordRequest
+	if requestData == nil {
 		log.Println("requestData should never be nil")
 		return nil
 	}
 	var successfulLogin bool
 	address := utils.Address(request.Context)
-	//responseMessage := translate("messages.dispatch.account.username_error")
-	//loggerMessage := ""
+	responseMessage := config.L.Get("messages.dispatch.account.username_error")
+	// loggerMessage := ""
 
 	// Get account from db.
-	account := game.GetAccountName(req.Account)
+	account := game.GetAccountName(requestData.Account)
 	// todo autoCreate
 	successfulLogin = account != nil
 	if !successfulLogin {
-		log.Println("user not exit, req come from ", address)
+		log.Println(config.L.Get("messages.dispatch.account.account_login_create_error"), address)
 	}
+
+	// Set response data.
 	if successfulLogin {
 		resp.Message = "OK"
 		resp.Data.Account.UID = account.ID
@@ -48,7 +52,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 		resp.Data.Account.Email = account.GetEmail()
 	} else {
 		resp.RetCode = -201
-		resp.Message = "Wrong in PasswordAuthenticator()"
+		resp.Message = responseMessage.(string)
 	}
 	return resp
 }
@@ -56,47 +60,8 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 type ExperimentalPasswordAuthenticator struct {
 }
 
-//func (a *ExperimentalPasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
-//	// todo 构造后传进来的
-//	var req *object.LoginAccountRequestJson
-//	req := request.PasswordRequest
-//	if req != nil {
-//		log.Fatal("requestData should never be nil")
-//		return nil
-//	}
-//	// todo 解密
-//	key := utils.ReadResource("/keys/auth_private-key.der")
-//}
-
-type SessionKeyAuthenticator struct{}
-
-func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any {
-	resp := object.NewComboTokenResJson()
-	var loginSuccess bool
-	if request.SessionKeyData == nil || request.SessionKeyRequest == nil {
-		log.Println("requestData should never be nil")
-		return nil
-	}
-	requestData := request.SessionKeyRequest
-	_ = requestData
-	loginData := request.SessionKeyData
-	address := utils.Address(request.Context)
-	// Get account from db.
-	account := game.GetAccountById(loginData.UID)
-
-	loginSuccess = account != nil && account.SessionKey == loginData.Token
-
-	if loginSuccess {
-		resp.Message = "OK"
-		resp.Data.OpenID = account.ID
-		resp.Data.ComboID = "157795300"
-		resp.Data.ComboToken = account.GenerateLoginToken()
-	} else {
-		resp.Retcode = -200
-		resp.Message = "Wrong in SessionKeyAuthenticator()"
-		log.Println(address)
-	}
-	return resp
+func (SessionKeyAuthenticator) ExperimentalPasswordAuthenticator(request *AuthenticationRequest) any {
+	return nil
 }
 
 type TokenAuthenticator struct {
@@ -127,9 +92,40 @@ func (TokenAuthenticator) Authenticate(request *AuthenticationRequest) any {
 		resp.Data.Account.Email = account.GetEmail()
 	} else {
 		resp.RetCode = -201
-		resp.Message = "Wrong in TokenAuthenticator()"
+		resp.Message = config.L.Get("messages.dispatch.account.account_cache_error").(string)
 
 		// Log the failure.
+	}
+	return resp
+}
+
+type SessionKeyAuthenticator struct{}
+
+func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any {
+	resp := object.NewComboTokenResJson()
+	var loginSuccess bool
+	if request.SessionKeyData == nil || request.SessionKeyRequest == nil {
+		log.Println("requestData should never be nil")
+		return nil
+	}
+	requestData := request.SessionKeyRequest
+	_ = requestData
+	loginData := request.SessionKeyData
+	address := utils.Address(request.Context)
+	// Get account from db.
+	account := game.GetAccountById(loginData.UID)
+
+	loginSuccess = account != nil && account.SessionKey == loginData.Token
+
+	if loginSuccess {
+		resp.Message = "OK"
+		resp.Data.OpenID = account.ID
+		resp.Data.ComboID = "157795300"
+		resp.Data.ComboToken = account.GenerateLoginToken()
+	} else {
+		resp.Retcode = -200
+		resp.Message = config.L.Get("messages.dispatch.account.session_key_error").(string)
+		log.Println(address)
 	}
 	return resp
 }
