@@ -25,7 +25,7 @@ var (
 	DispatchKey       []byte
 	DispatchSeed      []byte // todo check if race in regionhandler.go:74
 	EncryptKey        []byte
-	EncryptSeed       = int64(-6978694759076345648) // todo check 11468049314633205968/-6978694759076345648/9223372036854775807
+	EncryptSeed       = uint64(11468049314633205968)
 	EncryptSeedBuffer []byte
 	CurSigningKey     *rsa.PrivateKey
 	EncryptionKeys    = make(map[int]*rsa.PublicKey)
@@ -164,13 +164,13 @@ func EncryptAndSignRegionData(regionInfo []byte, keyID string) (*object.QueryCur
 	}, nil
 }
 
-func GenerateEncryptKeyAndSeed(encryptKey []byte) int64 {
-	var encryptSeed int64
+func GenerateEncryptKeyAndSeed(encryptKey []byte) uint64 {
+	var encryptSeed uint64
 	binary.Read(rand.Reader, binary.LittleEndian, &encryptSeed)
 
 	mt := mt19937.New()
 	mt.Seed(encryptSeed)
-	mt.Seed(int64(mt.NextUint64()))
+	mt.Seed(uint64(mt.NextUint64()))
 	mt.NextUint64()
 
 	for i := 0; i < 4096>>3; i++ {
