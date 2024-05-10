@@ -1,20 +1,20 @@
 # Go-Grasscutter
+
 [EN](README.md) | [简中](docs/README_zh-CN.md)
 ****
-project is archive. Don`t know how to fix crypto.
 this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutter).
-It only support for version CN 4.0.
+<br>It only test in version CN 4.0.
 
 ## Current features
 
 - [x] Login
 - [ ] Combat
-- [ ]  Friends list
-- [ ]  Teleportation
-- [ ]  Gacha system
-- [ ]  Co-op partially works
-- [ ]  Spawning monsters via console
-- [ ]  Inventory features (receiving items/characters, upgrading items/characters, etc)
+- [ ] Friends list
+- [ ] Teleportation
+- [ ] Gacha system
+- [ ] Co-op partially works
+- [ ] Spawning monsters via console
+- [ ] Inventory features (receiving items/characters, upgrading items/characters, etc)
 
 ### Quick Start (automatic)
 
