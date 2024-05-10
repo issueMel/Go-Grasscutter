@@ -92,7 +92,8 @@ func Initialize() {
 		}
 		data, err := proto.Marshal(updatedQuery)
 		if err != nil {
-			panic(err)
+			log.Println("updatedQuery Marshal error")
+			return
 		}
 		regions.Store(region.Name, &RegionData{
 			RegionQuery: updatedQuery,
@@ -136,7 +137,12 @@ func Initialize() {
 		EnableLoginPc:               true,
 	}
 	// Set the region list response.
-	regionListResponse = utils.Base64Encode([]byte(updatedRegionList.String()))
+	urlMarshal, err := proto.Marshal(&updatedRegionList)
+	if err != nil {
+		log.Println("updatedRegionList Marshal error:", err)
+		return
+	}
+	regionListResponse = utils.Base64Encode(urlMarshal)
 
 	// CN
 	// Modify the existing config option.
@@ -145,6 +151,7 @@ func Initialize() {
 	encodedConfig, err = json.Marshal(customConfig)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
 	encodedConfig = crypto.Xor(encodedConfig, crypto.DispatchKey)
@@ -156,17 +163,13 @@ func Initialize() {
 		EnableLoginPc:               true,
 	}
 
-	// todo fix it
 	// Set the region list response.
 	marshal, err := proto.Marshal(&updatedRegionListCN)
 	if err != nil {
-		log.Println("updatedRegionListCN Marshal error!")
+		log.Println("updatedRegionListCN Marshal error:", err)
 		return
 	}
 	regionListResponseCN = utils.Base64Encode(marshal)
-	// todo remove temp way
-	regionListResponseCN = "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"
-
 }
 
 type RegionData struct {
@@ -181,7 +184,6 @@ func ApplyRegionHandler(r *server.Hertz) {
 	r.GET("/query_cur_region/:region", queryCurrentRegion)
 }
 
-// todo fix it
 func queryRegionList(c context.Context, ctx *app.RequestContext) {
 	doOnce.Do(func() {
 		Initialize()
@@ -215,20 +217,6 @@ func queryRegionList(c context.Context, ctx *app.RequestContext) {
 
 }
 
-// GET /query_cur_region/
-// os_usa?
-// version=CNRELWin4.0.0
-// &lang=2
-// &platform=3
-// &binary=1
-// &time=778
-// &channel_id=1
-// &sub_channel_id=1
-// &account_type=1
-// &dispatchSeed=f586f0569733d33a
-// &key_id=4
-// &aid=10001
-// todo check make game can connect to game server
 func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 	doOnce.Do(func() {
 		Initialize()
@@ -240,8 +228,8 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 
 	// Get region data.
 	regionData := "CAESGE5vdCBGb3VuZCB2ZXJzaW9uIGNvbmZpZw=="
-	val, ok := regions.Load(regionName)
 	if ctx.QueryArgs().Len() > 0 {
+		val, ok := regions.Load(regionName)
 		if ok {
 			regionData = val.(*RegionData).Base64
 		}
@@ -250,15 +238,15 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 	re := regexp.MustCompile("[a-zA-Z]")
 	clientVersion := re.ReplaceAllString(versionName, "")
 	versionCode := strings.Split(clientVersion, ".")
-
 	versionMajor, _ := strconv.Atoi(versionCode[0])
 	versionMinor, _ := strconv.Atoi(versionCode[1])
 	versionFix, _ := strconv.Atoi(versionCode[2])
+
 	if versionMajor >= 3 ||
 		(versionMajor == 2 && versionMinor == 7 && versionFix >= 50) ||
 		(versionMajor == 2 && versionMinor == 8) {
 		event := dispatch.NewQueryCurrentRegionEvent(regionData)
-		// event.call();
+		// event.Call()
 		keyId := ctx.Query("key_id")
 		// The 'fix' or 'patch' version is not checked because it is only used
 		// when miHoYo is desperate and fucks up big time.
@@ -287,8 +275,19 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 					},
 				},
 			}
+
 			log.Printf("Connection denied for %s due to %t.\n", utils.Address(ctx), updateClient)
-			ctx.JSON(200, &rsp)
+			marshal, err := proto.Marshal(&rsp)
+			if err != nil {
+				log.Println("rsp proto.Marshal() wrong")
+				return
+			}
+			data, err := crypto.EncryptAndSignRegionData(marshal, keyId)
+			if err != nil {
+				log.Println("EncryptAndSignRegionData wrong")
+				return
+			}
+			ctx.JSON(200, &data)
 			return
 		}
 		if len(ctx.Query("dispatchSeed")) == 0 {
@@ -296,7 +295,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 				Content: event.RegionInfo,
 				Sign:    "TW9yZSBsb3ZlIGZvciBVQSBQYXRjaCBwbGF5ZXJz",
 			}
-			ctx.JSON(200, rsp)
+			ctx.JSON(200, &rsp)
 			return
 		}
 		regionInfo := utils.Base64Decode(event.RegionInfo)
@@ -305,7 +304,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 			log.Println("An error occurred while handling query_cur_region.", rsp)
 			return
 		}
-		ctx.JSON(200, rsp)
+		ctx.JSON(200, &rsp)
 	} else {
 		// todo Invoke event.
 		event := dispatch.NewQueryCurrentRegionEvent(regionData)
