@@ -123,7 +123,7 @@ type (
 )
 
 // newUDPSession create a new udp session for client or server
-func newUDPSession(conv uint32, dataShards, parityShards int, l *Listener, conn net.PacketConn, ownConn bool, remote net.Addr, block BlockCrypt) *UDPSession {
+func newUDPSession(conv uint64, dataShards, parityShards int, l *Listener, conn net.PacketConn, ownConn bool, remote net.Addr, block BlockCrypt) *UDPSession {
 	sess := new(UDPSession)
 	sess.die = make(chan struct{})
 	sess.nonce = new(nonceAES128)
@@ -597,7 +597,7 @@ func (s *UDPSession) update() {
 }
 
 // GetConv gets conversation id of a session
-func (s *UDPSession) GetConv() uint32 { return s.kcp.conv }
+func (s *UDPSession) GetConv() uint64 { return s.kcp.conv }
 
 // GetRTO gets current rto of the session
 func (s *UDPSession) GetRTO() uint32 {
@@ -808,20 +808,22 @@ func (l *Listener) packetInput(data []byte, addr net.Addr) {
 		l.sessionLock.RLock()
 		s, ok := l.sessions[addr.String()]
 		l.sessionLock.RUnlock()
-
-		var conv, sn uint32
+		var (
+			conv uint64
+			sn   uint32
+		)
 		convRecovered := false
 		fecFlag := binary.LittleEndian.Uint16(data[4:])
 		if fecFlag == typeData || fecFlag == typeParity { // 16bit kcp cmd [81-84] and frg [0-255] will not overlap with FEC type 0x00f1 0x00f2
 			// packet with FEC
 			if fecFlag == typeData && len(data) >= fecHeaderSizePlus2+IKCP_OVERHEAD {
-				conv = binary.LittleEndian.Uint32(data[fecHeaderSizePlus2:])
+				conv = binary.LittleEndian.Uint64(data[fecHeaderSizePlus2:])
 				sn = binary.LittleEndian.Uint32(data[fecHeaderSizePlus2+IKCP_SN_OFFSET:])
 				convRecovered = true
 			}
 		} else {
 			// packet without FEC
-			conv = binary.LittleEndian.Uint32(data)
+			conv = binary.LittleEndian.Uint64(data)
 			sn = binary.LittleEndian.Uint32(data[IKCP_SN_OFFSET:])
 			convRecovered = true
 		}
@@ -1047,19 +1049,19 @@ func DialWithOptions(raddr string, block BlockCrypt, dataShards, parityShards in
 		return nil, errors.WithStack(err)
 	}
 
-	var convid uint32
+	var convid uint64
 	binary.Read(rand.Reader, binary.LittleEndian, &convid)
 	return newUDPSession(convid, dataShards, parityShards, nil, conn, true, udpaddr, block), nil
 }
 
 // NewConn3 establishes a session and talks KCP protocol over a packet connection.
-func NewConn3(convid uint32, raddr net.Addr, block BlockCrypt, dataShards, parityShards int, conn net.PacketConn) (*UDPSession, error) {
+func NewConn3(convid uint64, raddr net.Addr, block BlockCrypt, dataShards, parityShards int, conn net.PacketConn) (*UDPSession, error) {
 	return newUDPSession(convid, dataShards, parityShards, nil, conn, false, raddr, block), nil
 }
 
 // NewConn2 establishes a session and talks KCP protocol over a packet connection.
 func NewConn2(raddr net.Addr, block BlockCrypt, dataShards, parityShards int, conn net.PacketConn) (*UDPSession, error) {
-	var convid uint32
+	var convid uint64
 	binary.Read(rand.Reader, binary.LittleEndian, &convid)
 	return NewConn3(convid, raddr, block, dataShards, parityShards, conn)
 }

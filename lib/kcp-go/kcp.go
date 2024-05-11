@@ -76,6 +76,18 @@ func ikcp_decode32u(p []byte, l *uint32) []byte {
 	return p[4:]
 }
 
+/* encode 64 bits unsigned int (lsb) */
+func ikcp_encode64u(p []byte, l uint64) []byte {
+	binary.LittleEndian.PutUint64(p, l)
+	return p[8:]
+}
+
+/* decode 64 bits unsigned int (lsb) */
+func ikcp_decode64u(p []byte, l *uint64) []byte {
+	*l = binary.LittleEndian.Uint64(p)
+	return p[8:]
+}
+
 func _imin_(a, b uint32) uint32 {
 	if a <= b {
 		return a
@@ -100,7 +112,7 @@ func _itimediff(later, earlier uint32) int32 {
 
 // segment defines a KCP segment
 type segment struct {
-	conv     uint32
+	conv     uint64
 	cmd      uint8
 	frg      uint8
 	wnd      uint16
@@ -117,7 +129,7 @@ type segment struct {
 
 // encode a segment into buffer
 func (seg *segment) encode(ptr []byte) []byte {
-	ptr = ikcp_encode32u(ptr, seg.conv)
+	ptr = ikcp_encode64u(ptr, seg.conv)
 	ptr = ikcp_encode8u(ptr, seg.cmd)
 	ptr = ikcp_encode8u(ptr, seg.frg)
 	ptr = ikcp_encode16u(ptr, seg.wnd)
@@ -131,29 +143,30 @@ func (seg *segment) encode(ptr []byte) []byte {
 
 // KCP defines a single KCP connection
 type KCP struct {
-	conv, mtu, mss, state                  uint32
-	snd_una, snd_nxt, rcv_nxt              uint32
-	ssthresh                               uint32
-	rx_rttvar, rx_srtt                     int32
-	rx_rto, rx_minrto                      uint32
-	snd_wnd, rcv_wnd, rmt_wnd, cwnd, probe uint32
-	interval, ts_flush                     uint32
-	nodelay, updated                       uint32
-	ts_probe, probe_wait                   uint32
-	dead_link, incr                        uint32
+	conv                                   uint64 // 会话id
+	mtu, mss, state                        uint32 // 最大传输单元, 最大分节大小, 状态
+	snd_una, snd_nxt, rcv_nxt              uint32 // 已发送但未确认, 下次发送下标, 下次接收下标
+	ssthresh                               uint32 // 慢启动门限
+	rx_rttvar, rx_srtt                     int32  // RTT(Round Trip Time), 平滑RTT
+	rx_rto, rx_minrto                      uint32 // RTO重传超时, MinRTO最小重传超时
+	snd_wnd, rcv_wnd, rmt_wnd, cwnd, probe uint32 // 发送窗口, 接收窗口, 当前对端可接收窗口, 拥塞控制窗口, 探测标志位
+	interval, ts_flush                     uint32 // 间隔, 发送
+	nodelay, updated                       uint32 // 是否无延迟, 状态是否已更新
+	ts_probe, probe_wait                   uint32 // 探测时间, 探测等待时间
+	dead_link, incr                        uint32 // 死连接 重传达到该值时认为连接是断开的, 拥塞控制增量
 
-	fastresend     int32
-	nocwnd, stream int32
+	fastresend     int32 // 是否快速重传 默认0关闭，可以设置2（2次ACK跨越将会直接重传）
+	nocwnd, stream int32 // 是否关闭拥塞控制窗口, 是否流传输
 
-	snd_queue []segment
-	rcv_queue []segment
-	snd_buf   []segment
-	rcv_buf   []segment
+	snd_queue []segment // 待发送窗口窗口
+	rcv_queue []segment // 收到后有序的队列
+	snd_buf   []segment // 发送后待确认的队列
+	rcv_buf   []segment // 收到的消息 无序的
 
 	acklist []ackItem
 
 	buffer   []byte
-	reserved int
+	reserved int // 头部预留长度, 为fec checksum准备
 	output   output_callback
 }
 
@@ -167,7 +180,7 @@ type ackItem struct {
 // 'conv' must be equal in the connection peers, or else data will be silently rejected.
 //
 // 'output' function will be called whenever these is data to be sent on wire.
-func NewKCP(conv uint32, output output_callback) *KCP {
+func NewKCP(conv uint64, output output_callback) *KCP {
 	kcp := new(KCP)
 	kcp.conv = conv
 	kcp.snd_wnd = IKCP_WND_SND
@@ -538,7 +551,8 @@ func (kcp *KCP) Input(data []byte, regular, ackNoDelay bool) int {
 	var windowSlides bool
 
 	for {
-		var ts, sn, length, una, conv uint32
+		var conv uint64
+		var ts, sn, length, una uint32
 		var wnd uint16
 		var cmd, frg uint8
 
@@ -546,7 +560,7 @@ func (kcp *KCP) Input(data []byte, regular, ackNoDelay bool) int {
 			break
 		}
 
-		data = ikcp_decode32u(data, &conv)
+		data = ikcp_decode64u(data, &conv)
 		if conv != kcp.conv {
 			return -1
 		}
