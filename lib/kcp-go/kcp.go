@@ -17,18 +17,18 @@ const (
 	IKCP_CMD_WINS    = 84 // cmd: window size (tell)
 	IKCP_ASK_SEND    = 1  // need to send IKCP_CMD_WASK
 	IKCP_ASK_TELL    = 2  // need to send IKCP_CMD_WINS
-	IKCP_WND_SND     = 32
-	IKCP_WND_RCV     = 32
+	IKCP_WND_SND     = 256
+	IKCP_WND_RCV     = 256
 	IKCP_MTU_DEF     = 1400
 	IKCP_ACK_FAST    = 3
 	IKCP_INTERVAL    = 100
-	IKCP_OVERHEAD    = 24
+	IKCP_OVERHEAD    = 28
 	IKCP_DEADLINK    = 20
 	IKCP_THRESH_INIT = 2
 	IKCP_THRESH_MIN  = 2
 	IKCP_PROBE_INIT  = 7000   // 7 secs to probe window size
 	IKCP_PROBE_LIMIT = 120000 // up to 120 secs to probe window
-	IKCP_SN_OFFSET   = 12
+	IKCP_SN_OFFSET   = 16
 )
 
 // monotonic reference time point
