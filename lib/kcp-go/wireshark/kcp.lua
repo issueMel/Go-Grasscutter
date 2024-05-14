@@ -1,22 +1,44 @@
 -- create protocol
 kcp_protocol = Proto("KCP", "KCP Protocol")
 
--- fields for kcp
-conv = ProtoField.uint64("kcp.conv", "conv")
-cmd = ProtoField.uint8("kcp.cmd", "cmd", base.DEC)
-frg = ProtoField.uint8("kcp.frg", "frg", base.DEC)
-wnd = ProtoField.uint16("kcp.wnd", "wnd", base.DEC)
-ts = ProtoField.uint32("kcp.ts", "ts", base.DEC)
-sn = ProtoField.uint32("kcp.sn", "sn", base.DEC)
-una = ProtoField.uint32("kcp.una", "una", base.DEC)
-len = ProtoField.uint32("kcp.len", "len", base.DEC)
+-- fields for kcp  -- 28 bit
+conv = ProtoField.uint64("kcp.conv", "conv")        -- 8
+cmd = ProtoField.uint8("kcp.cmd", "cmd", base.DEC)  -- 1
+frg = ProtoField.uint8("kcp.frg", "frg", base.DEC)  -- 1
+wnd = ProtoField.uint16("kcp.wnd", "wnd", base.DEC) -- 2
+ts = ProtoField.uint32("kcp.ts", "ts", base.DEC)    -- 4
+sn = ProtoField.uint32("kcp.sn", "sn", base.DEC)    -- 4
+una = ProtoField.uint32("kcp.una", "una", base.DEC) -- 4
+len = ProtoField.uint32("kcp.len", "len", base.DEC) -- 4
 
-kcp_protocol.fields = {conv, cmd, frg, wnd, ts, sn, una, len}
+kcp_protocol.fields = { conv, cmd, frg, wnd, ts, sn, una, len }
 
 -- dissect each udp packet
 function kcp_protocol.dissector(buffer, pinfo, tree)
     length = buffer:len()
-    if length == 0 then
+    if length <= 20 then
+        -- dissect packet in udp
+        local cmd_id = buffer(0, 4)
+        local b = buffer(4, 4)
+        local c = buffer(8, 4)
+        local d = buffer(12, 4)
+        local e = buffer(16, 4)
+
+        local first_cmd_name = get_packet_name(cmd_id:int())
+        local info = string.format("[%s]", first_cmd_name)
+        pinfo.cols.protocol = kcp_protocol.name
+        udp_info = string.gsub(tostring(pinfo.cols.info), "Len", "Udplen", 1)
+        pinfo.cols.info = string.gsub(udp_info, " U", info .. " U", 1)
+
+        local tree_title = string.format(
+                "KCP Protocol, CmdId = %d, B = %d, C = %d, D = %d, E = %d",
+                cmd_id:int(),
+                b:le_int(),
+                c:le_int(),
+                d:int(),
+                e:int()
+        )
+        tree:add(kcp_protocol, buffer(), tree_title)
         return
     end
 
@@ -30,7 +52,7 @@ function kcp_protocol.dissector(buffer, pinfo, tree)
     udp_info = string.gsub(tostring(pinfo.cols.info), "Len", "Udplen", 1)
     pinfo.cols.info = string.gsub(udp_info, " U", info .. " U", 1)
 
-    -- dssect multi kcp packet in udp
+    -- dissect multi kcp packet in udp
     local offset = 0
     while offset < buffer:len() do
         local conv_buf = buffer(offset + 0, 8)
@@ -42,8 +64,7 @@ function kcp_protocol.dissector(buffer, pinfo, tree)
         local cmd_name = get_cmd_name(cmd_buf:le_int())
         local data_len = len_buf:le_int()
 
-        local tree_title =
-        string.format(
+        local tree_title = string.format(
                 "KCP Protocol, %s, Sn: %d, Conv: %s, Wnd: %d, Len: %d",
                 cmd_name,
                 sn_buf:le_int(),
@@ -76,6 +97,16 @@ function get_cmd_name(cmd_val)
         return "TELL"
     else
         return "UN_KNOW"
+    end
+end
+
+function get_packet_name(val)
+    if val == 255 then
+        return "ASK"
+    elseif val == 325 then
+        return "TELL"
+    elseif val == 404 then
+        return "Disconnect"
     end
 end
 
