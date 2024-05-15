@@ -541,7 +541,6 @@ func (kcp *KCP) parse_data(newseg segment) bool {
 // 'ackNoDelay' will trigger immediate ACK, but surely it will not be efficient in bandwidth
 func (kcp *KCP) Input(data []byte, regular, ackNoDelay bool) int {
 	snd_una := kcp.snd_una
-	// todo fix udp packet
 	if len(data) < IKCP_OVERHEAD {
 		return -1
 	}
