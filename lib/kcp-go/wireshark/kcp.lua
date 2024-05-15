@@ -18,25 +18,25 @@ function kcp_protocol.dissector(buffer, pinfo, tree)
     length = buffer:len()
     if length <= 20 then
         -- dissect packet in udp
-        local cmd_id = buffer(0, 4)
-        local b = buffer(4, 4)
-        local c = buffer(8, 4)
-        local d = buffer(12, 4)
-        local e = buffer(16, 4)
+        local opcode = buffer(0, 4)
+        local conv1 = buffer(4, 4)
+        local conv2 = buffer(8, 4)
+        local code = buffer(12, 4)
+        local const = buffer(16, 4)
 
-        local first_cmd_name = get_packet_name(cmd_id:int())
+        local first_cmd_name = get_packet_name(opcode:int())
         local info = string.format("[%s]", first_cmd_name)
         pinfo.cols.protocol = kcp_protocol.name
         udp_info = string.gsub(tostring(pinfo.cols.info), "Len", "Udplen", 1)
         pinfo.cols.info = string.gsub(udp_info, " U", info .. " U", 1)
 
         local tree_title = string.format(
-                "KCP Protocol, CmdId = %d, B = %d, C = %d, D = %d, E = %d",
-                cmd_id:int(),
-                b:le_int(),
-                c:le_int(),
-                d:int(),
-                e:int()
+                "KCP Protocol, opcode = %d, conv1 = %d, conv2 = %d, enet/code = %d, const = %d",
+                opcode:int(),
+                conv1:le_int(),
+                conv2:le_int(),
+                code:int(),
+                const:int()
         )
         tree:add(kcp_protocol, buffer(), tree_title)
         return
