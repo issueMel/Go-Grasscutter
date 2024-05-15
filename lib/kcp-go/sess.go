@@ -790,6 +790,11 @@ type (
 // packet input stage
 func (l *Listener) packetInput(data []byte, addr net.Addr) {
 	decrypted := false
+	if len(data) == 20 {
+		// handle connect or disconnect packet
+		handleEnet(data, l, addr)
+		return
+	}
 	if l.block != nil && len(data) >= cryptHeaderSize {
 		l.block.Decrypt(data, data)
 		data = data[nonceSize:]
