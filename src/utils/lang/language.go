@@ -1,3 +1,0 @@
-package lang
-
-// resources/languages
