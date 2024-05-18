@@ -1,10 +1,10 @@
 package kcp
 
 import (
+	"Go-Grasscutter/log"
 	"bytes"
 	"crypto/rand"
 	"encoding/binary"
-	"log"
 	"math/big"
 	"net"
 	"sync"
@@ -70,7 +70,7 @@ func sendDisconnectPacket(conv int64, code int, l *Listener, addr net.Addr) {
 func udpSend(data []byte, s *Listener, addr net.Addr) {
 	_, err := s.conn.WriteTo(data, addr)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return
 	}
 }

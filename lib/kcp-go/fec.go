@@ -110,7 +110,6 @@ func (dec *fecDecoder) decode(in fecPacket) (recovered [][]byte) {
 				dec.decodeCache = make([][]byte, dec.shardSize)
 				dec.flagCache = make([]bool, dec.shardSize)
 				dec.shouldTune = false
-				//log.Println("autotune to :", dec.dataShards, dec.parityShards)
 			}
 		}
 	}
