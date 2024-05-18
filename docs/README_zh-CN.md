@@ -49,7 +49,7 @@ cd Go-Grasscutter
 ##### Compile
 
 ```shell
-go build Go-Grasscutter/src
+go build Go-Grasscutter
 ```
 
 ##### Compiling the Handbook (Manually)
