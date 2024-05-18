@@ -21,7 +21,7 @@ import (
 
 var (
 	DispatchKey       []byte
-	DispatchSeed      []byte // todo check if race in regionhandler.go:74
+	DispatchSeed      []byte
 	EncryptKey        []byte
 	EncryptSeed       = uint64(11468049314633205968)
 	EncryptSeedBuffer []byte

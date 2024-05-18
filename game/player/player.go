@@ -1,13 +1,13 @@
 package player
 
 import (
-	"Go-Grasscutter/src/world"
+	"Go-Grasscutter/game"
 )
 
 type Player struct {
 	ID         int    `bson:"_id"`
 	AccountID  string `bson:"accountId" index:"unique"`
-	Account    *world.Account
+	Account    *game.Account
 	SessionKey string `bson:"-"`
 	Nickname   string `bson:"nickname"`
 	Signature  string `bson:"signature"`
