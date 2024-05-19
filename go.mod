@@ -6,7 +6,6 @@ toolchain go1.22.2
 
 require (
 	github.com/cloudwego/hertz v0.9.0
-	github.com/golang/protobuf v1.5.4
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/reedsolomon v1.12.1
 	github.com/pkg/errors v0.9.1
@@ -31,6 +30,7 @@ require (
 	github.com/cloudwego/netpoll v0.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect

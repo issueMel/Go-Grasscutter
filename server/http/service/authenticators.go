@@ -1,7 +1,7 @@
 package service
 
 import (
-	"Go-Grasscutter/game"
+	"Go-Grasscutter/game/player"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/http/object"
 	"Go-Grasscutter/utils"
@@ -37,7 +37,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	// loggerMessage := ""
 
 	// Get account from db.
-	account := game.GetAccountName(requestData.Account)
+	account := player.GetAccountName(requestData.Account)
 	// todo autoCreate
 	successfulLogin = account != nil
 	if !successfulLogin {
@@ -80,7 +80,7 @@ func (TokenAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	//address := utils.Address(request.Context)
 
 	// Get account from database.
-	account := game.GetAccountById(requestData.UID)
+	account := player.GetAccountById(requestData.UID)
 	// Check if account exists/token is valid.
 	successfulLogin = account != nil && account.SessionKey == requestData.Token
 
@@ -113,7 +113,7 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 	loginData := request.SessionKeyData
 	address := utils.Address(request.Context)
 	// Get account from db.
-	account := game.GetAccountById(loginData.UID)
+	account := player.GetAccountById(loginData.UID)
 
 	loginSuccess = account != nil && account.SessionKey == loginData.Token
 

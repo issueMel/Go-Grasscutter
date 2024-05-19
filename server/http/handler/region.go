@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 	"regexp"
 	"strconv"
 	"strings"
