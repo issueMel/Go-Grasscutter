@@ -15,7 +15,7 @@ func ClientLogin(c context.Context, ctx *app.RequestContext) {
 	// Validate data.
 	err := ctx.BindJSON(&req)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 	// Pass data to authentication handler.
@@ -32,14 +32,14 @@ func SessionKeyLogin(c context.Context, ctx *app.RequestContext) {
 	// Validate body data.
 	err := ctx.BindJSON(&req)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 	// Decode additional body data.
 	tokenData := &object.LoginTokenData{}
 	err = json.Unmarshal([]byte(req.Data), &tokenData)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 	// Pass data to authentication handler.
@@ -57,7 +57,7 @@ func TokenLogin(c context.Context, ctx *app.RequestContext) {
 	// Validate body data.
 	err := ctx.BindJSON(&req)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 	// Pass data to authentication handler.

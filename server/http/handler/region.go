@@ -59,7 +59,7 @@ func Initialize() {
 
 	// todo getRunMode() != ServerRunMode.HYBRID && set const "HYBRID"
 	if c.Server.RunMode != "HYBRID" && len(configuredRegions) == 0 {
-		log.Fatal("[Dispatch] There are no game servers available. Exiting due to unplayable state.")
+		log.SugaredLogger.Fatal("[Dispatch] There are no game servers available. Exiting due to unplayable state.")
 	} else if len(configuredRegions) == 0 {
 		gameInfo := c.Server.Game
 		configuredRegions = append(configuredRegions, &config.Region{
@@ -72,7 +72,7 @@ func Initialize() {
 
 	for _, region := range configuredRegions {
 		if _, ok := usedNames[region.Name]; ok {
-			log.Info("Region name already in use.")
+			log.SugaredLogger.Info("Region name already in use.")
 			continue
 		}
 		// Create a region identifier.
@@ -96,7 +96,7 @@ func Initialize() {
 		}
 		data, err := proto.Marshal(updatedQuery)
 		if err != nil {
-			log.Error("updatedQuery Marshal error")
+			log.SugaredLogger.Error("updatedQuery Marshal error")
 			return
 		}
 		regions.Store(region.Name, &RegionData{
@@ -143,7 +143,7 @@ func Initialize() {
 	// Set the region list response.
 	urlMarshal, err := proto.Marshal(&updatedRegionList)
 	if err != nil {
-		log.Error("updatedRegionList Marshal error:", err)
+		log.SugaredLogger.Error("updatedRegionList Marshal error:", err)
 		return
 	}
 	regionListResponse = utils.Base64Encode(urlMarshal)
@@ -154,7 +154,7 @@ func Initialize() {
 	// XOR the config with the key.
 	encodedConfig, err = json.Marshal(customConfig)
 	if err != nil {
-		log.Error("updatedRegionList Marshal error:", err)
+		log.SugaredLogger.Error("updatedRegionList Marshal error:", err)
 		return
 	}
 
@@ -170,7 +170,7 @@ func Initialize() {
 	// Set the region list response.
 	marshal, err := proto.Marshal(&updatedRegionListCN)
 	if err != nil {
-		log.Error("updatedRegionListCN Marshal error:", err)
+		log.SugaredLogger.Error("updatedRegionListCN Marshal error:", err)
 		return
 	}
 	regionListResponseCN = utils.Base64Encode(marshal)
@@ -280,15 +280,15 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 				},
 			}
 
-			log.Info("Connection denied for %s due to %t.\n", utils.Address(ctx), updateClient)
+			log.SugaredLogger.Info("Connection denied for %s due to %t.\n", utils.Address(ctx), updateClient)
 			marshal, err := proto.Marshal(&rsp)
 			if err != nil {
-				log.Error("rsp proto.Marshal() error")
+				log.SugaredLogger.Error("rsp proto.Marshal() error")
 				return
 			}
 			data, err := crypto.EncryptAndSignRegionData(marshal, keyId)
 			if err != nil {
-				log.Error("EncryptAndSignRegionData error")
+				log.SugaredLogger.Error("EncryptAndSignRegionData error")
 				return
 			}
 			ctx.JSON(200, &data)
@@ -305,7 +305,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 		regionInfo := utils.Base64Decode(regionData)
 		rsp, err := crypto.EncryptAndSignRegionData(regionInfo, keyId)
 		if err != nil {
-			log.Error("An error occurred while handling query_cur_region.", rsp)
+			log.SugaredLogger.Error("An error occurred while handling query_cur_region.", rsp)
 			return
 		}
 		ctx.JSON(200, &rsp)

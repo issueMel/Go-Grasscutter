@@ -5,34 +5,56 @@ import (
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/utils/crypto"
+	"Go-Grasscutter/utils/lang"
 	"bytes"
 	"encoding/binary"
+	"github.com/pkg/errors"
+	"io"
+	"sync"
 )
 
 func Init() {
 	// Kcp Server
-	log.Info("kcp listens on 22102")
+	log.SugaredLogger.Info("kcp listens on 22102")
 	lis, err := kcp.ListenWithOptions(":22102", nil, 0, 0)
 	if err != nil {
 		panic(err)
 	}
 	for {
+		// todo limit player number -> kick or limit online number
 		conn, e := lis.AcceptKCP()
 		if e != nil {
 			panic(e)
 		}
-		conn.SetNoDelay(1, config.Conf.Server.Game.KcpInterval, 2, 1)
-		conn.SetMtu(1400)
-		// conn.SetDeadline(time.Now().Add(30 * time.Second))
-		conn.SetWindowSize(256, 256)
-		conn.SetACKNoDelay(true)
-		var buffer = make([]byte, 4096)
+		log.SugaredLogger.Info(lang.Translate("messages.game.connect"), conn.RemoteAddr().String())
+		sessionManagement.Store(conn, nil)
+		go Connected(conn)
+	}
+}
+
+var sessionManagement sync.Map // *UDPSession, Player
+
+func Connected(conn *kcp.UDPSession) {
+	conn.SetNoDelay(1, config.Conf.Server.Game.KcpInterval, 2, 1)
+	conn.SetMtu(1400)
+	conn.SetWindowSize(256, 256)
+	conn.SetACKNoDelay(true)
+	// conn.SetDeadline(time.Now().Add(30 * time.Second))
+	var buffer = make([]byte, 4096)
+
+	// remove session when error
+	defer sessionManagement.Delete(conn)
+
+	for {
 		n, e := conn.Read(buffer)
 		if e != nil {
-			log.Error(e)
-			continue
+			if errors.Is(e, io.ErrClosedPipe) {
+				log.SugaredLogger.Info(lang.Translate("messages.game.disconnect"), conn.RemoteAddr())
+				return
+			}
+			log.SugaredLogger.Error(e)
+			return
 		}
-		// todo limit player number
 		go handlerReceive(buffer[:n])
 	}
 }
@@ -49,13 +71,13 @@ func handlerReceive(buffer []byte) {
 		var payloadLength uint32
 		err := binary.Read(buf, binary.BigEndian, &const1)
 		if err != nil {
-			log.Error("Read const1 error:", err)
+			log.SugaredLogger.Error("Read const1 error:", err)
 			break
 		}
 		// Packet sanity check
 		if const1 != 17767 {
 			// Bad packet
-			log.Error("Bad Data Package Received: got %d ,expect 17767", const1)
+			log.SugaredLogger.Error("Bad Data Package Received: got %d ,expect 17767", const1)
 			break
 		}
 
@@ -68,26 +90,26 @@ func handlerReceive(buffer []byte) {
 
 		_, err = buf.Read(header)
 		if err != nil {
-			log.Error("Read header error:", err)
+			log.SugaredLogger.Error("Read header error:", err)
 			break
 		}
 		_, err = buf.Read(payload)
 		if err != nil {
-			log.Error("Read payload error:", err)
+			log.SugaredLogger.Error("Read payload error:", err)
 			break
 		}
 
 		// Sanity check #2
 		err = binary.Read(buf, binary.BigEndian, &const2)
 		if err != nil {
-			log.Error("Read short const2 error:", err)
+			log.SugaredLogger.Error("Read short const2 error:", err)
 			break
 		}
 		if const2 != -30293 {
-			log.Error("Bad Data Package Received: got %d ,expect -30293", const2)
+			log.SugaredLogger.Error("Bad Data Package Received: got %d ,expect -30293", const2)
 			break // Bad packet
 		}
 		// todo Handle
-		log.Info("handle", opcode)
+		log.SugaredLogger.Info("handle", opcode)
 	}
 }

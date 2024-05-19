@@ -25,7 +25,7 @@ func LoadLanguage() {
 	code, err := getLanguageCode()
 	r, err := utils.GetResource().ReadFile(prefix + code + ".json")
 	if err != nil {
-		log.Info(err)
+		log.SugaredLogger.Info(err)
 		r, err = utils.GetResource().ReadFile(prefix + "en-US.json")
 		if err != nil {
 			// en-US.json should exist
@@ -40,7 +40,7 @@ func LoadLanguage() {
 
 func Translate(key string) string {
 	if L.Get(key).(string) == "" {
-		log.Error("Failed to format string: ", key)
+		log.SugaredLogger.Error("Failed to format string: ", key)
 	}
 	return L.Get(key).(string)
 }

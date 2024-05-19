@@ -28,7 +28,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 
 	requestData := request.PasswordRequest
 	if requestData == nil {
-		log.Error("requestData should never be nil")
+		log.SugaredLogger.Error("requestData should never be nil")
 		return nil
 	}
 	var successfulLogin bool
@@ -41,7 +41,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	// todo autoCreate
 	successfulLogin = account != nil
 	if !successfulLogin {
-		log.Info(lang.Translate("messages.dispatch.account.account_login_create_error") + address)
+		log.SugaredLogger.Info(lang.Translate("messages.dispatch.account.account_login_create_error") + address)
 	}
 
 	// Set response data.
@@ -72,7 +72,7 @@ func (TokenAuthenticator) Authenticate(request *AuthenticationRequest) any {
 	resp := object.NewLoginResultJson()
 	requestData := request.TokenRequest
 	if requestData == nil {
-		log.Error("requestData should never be nil")
+		log.SugaredLogger.Error("requestData should never be nil")
 		return nil
 	}
 	var successfulLogin bool
@@ -105,7 +105,7 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 	resp := object.NewComboTokenResJson()
 	var loginSuccess bool
 	if request.SessionKeyData == nil || request.SessionKeyRequest == nil {
-		log.Error("requestData should never be nil")
+		log.SugaredLogger.Error("requestData should never be nil")
 		return nil
 	}
 	requestData := request.SessionKeyRequest
@@ -125,7 +125,7 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 	} else {
 		resp.Retcode = -200
 		resp.Message = lang.Translate("messages.dispatch.account.session_key_error")
-		log.Info(address)
+		log.SugaredLogger.Info(address)
 	}
 	return resp
 }

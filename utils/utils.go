@@ -49,7 +49,7 @@ func Base64Encode(toEncode []byte) string {
 func Base64Decode(toDecode string) []byte {
 	decodedData, err := base64.StdEncoding.DecodeString(toDecode)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 	}
 	return decodedData
 }

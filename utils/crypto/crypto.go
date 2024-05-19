@@ -44,13 +44,13 @@ func initCurSigningKey(resourcePath string) {
 	// Parse private key
 	privateKey, err := x509.ParsePKCS8PrivateKey(derBytes)
 	if err != nil {
-		log.Error("Error:", err)
+		log.SugaredLogger.Error("Error:", err)
 	}
 	ok := true
 	// Convert to RSA private key type
 	CurSigningKey, ok = privateKey.(*rsa.PrivateKey)
 	if !ok {
-		log.Error("Error:", err)
+		log.SugaredLogger.Error("Error:", err)
 	}
 }
 
@@ -59,7 +59,7 @@ func initGameKeys() {
 	r := utils.GetResource()
 	files, err := r.ReadDir("resources/keys/game_keys")
 	if err != nil {
-		log.Error("Error:", err)
+		log.SugaredLogger.Error("Error:", err)
 		return
 	}
 	for _, file := range files {
@@ -71,17 +71,17 @@ func initGameKeys() {
 			keyBytes := utils.ReadResource("/keys/game_keys/" + file.Name())
 			key, err := x509.ParsePKIXPublicKey(keyBytes)
 			if err != nil {
-				log.Error("Error parsing public key:", err)
+				log.SugaredLogger.Error("Error parsing public key:", err)
 				continue
 			}
 			rsaKey, ok := key.(*rsa.PublicKey)
 			if !ok {
-				log.Error("Key is not an RSA public key")
+				log.SugaredLogger.Error("Key is not an RSA public key")
 				continue
 			}
 			id, err := strconv.Atoi(m[1])
 			if err != nil {
-				log.Error("Error converting ID to integer:", err)
+				log.SugaredLogger.Error("Error converting ID to integer:", err)
 				continue
 			}
 			EncryptionKeys[id] = rsaKey
@@ -93,7 +93,7 @@ func CreateSessionKey(length int) []byte {
 	bytes := make([]byte, length)
 	_, err := rand.Read(bytes)
 	if err != nil {
-		log.Error("CreateSessionKey error:", err)
+		log.SugaredLogger.Error("CreateSessionKey error:", err)
 	}
 	return bytes
 }

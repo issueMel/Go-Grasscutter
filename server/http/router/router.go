@@ -11,7 +11,8 @@ var r *server.Hertz
 func InitRouter() *server.Hertz {
 	r = server.Default(server.WithHostPorts(":443"))
 	// change log level when dev
-	hlog.SetLevel(hlog.LevelFatal)
+	hlog.SetLevel(hlog.LevelError)
+
 	ApplyHandler()
 
 	return r

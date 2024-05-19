@@ -69,7 +69,7 @@ func GetAccountName(username string) *Account {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil
 		}
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return nil
 	}
 	return account
@@ -82,7 +82,7 @@ func GetAccountById(uid string) *Account {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil
 		}
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return nil
 	}
 	return account

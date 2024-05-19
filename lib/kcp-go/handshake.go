@@ -7,16 +7,6 @@ import (
 	"encoding/binary"
 	"math/big"
 	"net"
-	"sync"
-)
-
-type handshakeWaiter struct {
-	ConvId uint64
-	Addr   string
-}
-
-var (
-	handshakeWaiters sync.Map
 )
 
 func handleEnet(data []byte, l *Listener, addr net.Addr) {
@@ -42,7 +32,10 @@ func handleEnet(data []byte, l *Listener, addr net.Addr) {
 		sendHandshakeRsp(enet, l, addr, convID.Int64())
 	case 404:
 		if l != nil {
-			l.closeSession(addr)
+			s, ok := l.sessions[addr.String()]
+			if ok {
+				s.Close()
+			}
 		}
 	}
 }
@@ -70,7 +63,7 @@ func sendDisconnectPacket(conv int64, code int, l *Listener, addr net.Addr) {
 func udpSend(data []byte, s *Listener, addr net.Addr) {
 	_, err := s.conn.WriteTo(data, addr)
 	if err != nil {
-		log.Error(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 }
