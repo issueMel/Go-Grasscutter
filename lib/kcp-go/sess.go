@@ -343,6 +343,7 @@ func (s *UDPSession) uncork() {
 
 // Close closes the connection.
 func (s *UDPSession) Close() error {
+	sendDisconnectPacket(int64(s.GetConv()), 5, s.l, s.remote)
 	var once bool
 	s.dieOnce.Do(func() {
 		close(s.die)
