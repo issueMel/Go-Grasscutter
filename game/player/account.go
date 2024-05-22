@@ -1,9 +1,9 @@
-package game
+package player
 
 import (
 	"Go-Grasscutter/db"
 	"Go-Grasscutter/log"
-	utils2 "Go-Grasscutter/utils"
+	"Go-Grasscutter/utils"
 	"Go-Grasscutter/utils/crypto"
 	"context"
 	"github.com/pkg/errors"
@@ -21,8 +21,8 @@ type Account struct {
 	Permissions    []string `bson:"permissions"`
 	Locale         string   `bson:"locale"`
 	BanReason      string   `bson:"banReason"`
-	BanEndTime     int64    `bson:"banEndTime"`
-	BanStartTime   int64    `bson:"banStartTime"`
+	BanEndTime     int      `bson:"banEndTime"`
+	BanStartTime   int      `bson:"banStartTime"`
 	IsBanned       bool     `bson:"isBanned"`
 }
 
@@ -40,7 +40,7 @@ func (a *Account) GetEmail() string {
 }
 
 func (a *Account) GenerateSessionKey() string {
-	sessionKey := utils2.BytesToHex(crypto.CreateSessionKey(32))
+	sessionKey := utils.BytesToHex(crypto.CreateSessionKey(32))
 	// save in db
 	a.SessionKey = sessionKey
 	a.SaveAccount()
@@ -48,7 +48,7 @@ func (a *Account) GenerateSessionKey() string {
 }
 
 func (a *Account) GenerateLoginToken() string {
-	token := utils2.BytesToHex(crypto.CreateSessionKey(32))
+	token := utils.BytesToHex(crypto.CreateSessionKey(32))
 	// save in db
 	a.Token = token
 	a.SaveAccount()
