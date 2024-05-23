@@ -11,10 +11,10 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"math/big"
+	mrand "math/rand/v2"
 	"regexp"
 	"strconv"
 )
@@ -162,13 +162,11 @@ func EncryptAndSignRegionData(regionInfo []byte, keyID string) (*object.QueryCur
 	}, nil
 }
 
-func GenerateEncryptKeyAndSeed(encryptKey []byte) uint64 {
-	var encryptSeed uint64
-	binary.Read(rand.Reader, binary.LittleEndian, &encryptSeed)
-
+func GenerateEncryptKeyAndSeed(encryptKey []byte) ([]byte, uint64) {
+	encryptSeed := mrand.Uint64()
 	mt := mt19937.New()
 	mt.Seed(encryptSeed)
-	mt.Seed(uint64(mt.NextUint64()))
+	mt.Seed(mt.NextUint64())
 	mt.NextUint64()
 
 	for i := 0; i < 4096>>3; i++ {
@@ -182,5 +180,5 @@ func GenerateEncryptKeyAndSeed(encryptKey []byte) uint64 {
 		encryptKey[(i<<3)+6] = byte(rand >> 8)
 		encryptKey[(i<<3)+7] = byte(rand)
 	}
-	return encryptSeed
+	return encryptKey, encryptSeed
 }
