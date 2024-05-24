@@ -3,6 +3,7 @@ package kcp
 import (
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
+	_ "Go-Grasscutter/server/kcp/packet/handler"
 	"Go-Grasscutter/server/kcp/session"
 	"Go-Grasscutter/utils/lang"
 )
@@ -15,13 +16,12 @@ func Init() {
 		panic(err)
 	}
 	for {
-		// todo limit player number -> kick or limit online number
 		conn, e := lis.AcceptKCP()
 		if e != nil {
 			panic(e)
 		}
-		log.SugaredLogger.Info(lang.Translate("messages.game.connect"), conn.RemoteAddr().String())
-		if s, ok := session.Management.Load(&conn); ok {
+		log.SugaredLogger.Infof(lang.Translate("messages.game.connect"), conn.RemoteAddr().String())
+		if s, ok := session.Management.Load(conn); ok {
 			go s.(*session.Session).Connected()
 		} else {
 			sess := session.NewGameSession()

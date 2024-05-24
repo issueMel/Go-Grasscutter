@@ -18,12 +18,15 @@ type Session struct {
 	EncryptKey    []byte
 	UseSecretKey  bool
 	State         SessionState
-	ClientTime    int
+	ClientTime    uint32
 	LastPingTime  int64
-	LastClientSeq int
+	LastClientSeq uint32
 }
 
 func (s *Session) Send(packet *base.BasePacket) {
+	if packet == nil {
+		return
+	}
 	if packet.Opcode <= 0 {
 		log.SugaredLogger.Warn("Tried to send packet with missing cmd id!")
 		return
@@ -39,9 +42,9 @@ func (s *Session) Send(packet *base.BasePacket) {
 
 	if packet.ShouldEncrypt {
 		if packet.UseDispatchKey {
-			crypto.Xor(bytes, crypto.DispatchKey)
+			bytes = crypto.Xor(bytes, crypto.DispatchKey)
 		} else {
-			crypto.Xor(bytes, s.EncryptKey)
+			bytes = crypto.Xor(bytes, s.EncryptKey)
 		}
 	}
 
@@ -62,18 +65,17 @@ func NewGameSession() *Session {
 		LastClientSeq: 10,
 	}
 	if config.Conf.Server.Game.UseUniquePacketKey {
-		g.EncryptKey = make([]byte, 4096)
-		g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(g.EncryptKey)
+		g.EncryptKey, g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(make([]byte, 4096))
 	}
 	return g
 }
 
-func (s *Session) UpdateLastPingTime(clientTime int) {
+func (s *Session) UpdateLastPingTime(clientTime uint32) {
 	s.ClientTime = clientTime
 	s.LastPingTime = time.Now().UnixMilli()
 }
 
-func (s *Session) GetNextClientSequence() int {
+func (s *Session) GetNextClientSequence() uint32 {
 	s.LastClientSeq++
 	return s.LastClientSeq
 }

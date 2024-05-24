@@ -2,10 +2,10 @@ package base
 
 import (
 	"Go-Grasscutter/generated/pb"
+	"Go-Grasscutter/log"
 	"bytes"
 	"encoding/binary"
 	"google.golang.org/protobuf/proto"
-	"log"
 	"time"
 )
 
@@ -21,23 +21,27 @@ type BasePacket struct {
 	UseDispatchKey bool
 }
 
-func (b BasePacket) BuildHeader(clientSequence int) {
-	if b.Header != nil && clientSequence == 0 {
+func (b BasePacket) BuildHeader(clientSequence uint32) {
+	if len(b.Header) > 0 && clientSequence == 0 {
 		return
 	}
 	packetHead := pb.PacketHead{
-		ClientSequenceId: uint32(clientSequence),
+		ClientSequenceId: clientSequence,
 		SentMs:           uint64(time.Now().UnixMilli()),
 	}
 	head, err := proto.Marshal(&packetHead)
 	if err != nil {
-		log.Println(err)
+		log.SugaredLogger.Error(err)
 		return
 	}
 	b.Header = head
 }
 
 func (b BasePacket) Build() []byte {
+	b.const1 = 17767
+	b.const2 = -30293
+	b.ShouldEncrypt = true
+
 	l := 2 + 2 + 2 + 4 + len(b.Header) + len(b.Data) + 2
 	buf := bytes.NewBuffer(make([]byte, 0, l))
 

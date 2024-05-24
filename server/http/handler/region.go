@@ -224,10 +224,6 @@ func queryRegionList(c context.Context, ctx *app.RequestContext) {
 }
 
 func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
-	doOnce.Do(func() {
-		Initialize()
-	})
-
 	// Get region to query.
 	regionName := ctx.Param("region")
 	versionName := ctx.Query("version")
@@ -302,7 +298,11 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 			ctx.JSON(200, &rsp)
 			return
 		}
-		regionInfo := utils.Base64Decode(regionData)
+		regionInfo, err := utils.Base64Decode(regionData)
+		if err != nil {
+			log.SugaredLogger.Error("An error occurred while Base64Decode.", err)
+			return
+		}
 		rsp, err := crypto.EncryptAndSignRegionData(regionInfo, keyId)
 		if err != nil {
 			log.SugaredLogger.Error("An error occurred while handling query_cur_region.", rsp)

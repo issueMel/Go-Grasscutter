@@ -30,7 +30,7 @@ func (s *Session) Connected() {
 		n, e := conn.Read(buffer)
 		if e != nil {
 			if errors.Is(e, io.ErrClosedPipe) {
-				log.SugaredLogger.Info(lang.Translate("messages.game.disconnect"), conn.RemoteAddr())
+				log.SugaredLogger.Infof(lang.Translate("messages.game.disconnect"), conn.RemoteAddr())
 				return
 			}
 			log.SugaredLogger.Error(e)
@@ -43,12 +43,12 @@ func (s *Session) Connected() {
 func (s *Session) handleReceive(buffer []byte) {
 	var buf *bytes.Buffer
 	// Decrypt and turn back into a packet
-	if s.UseSecretKey {
-		buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
-	} else {
-		buf = bytes.NewBuffer(crypto.Xor(buffer, s.EncryptKey))
-	}
-
+	//if s.UseSecretKey {
+	//	buf = bytes.NewBuffer(crypto.Xor(buffer, s.EncryptKey))
+	//} else {
+	//	buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
+	//}
+	buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
 	for buf.Len() > 0 {
 		if buf.Len() < 12 {
 			break
@@ -64,7 +64,7 @@ func (s *Session) handleReceive(buffer []byte) {
 		// Packet sanity check
 		if const1 != 17767 {
 			// Bad packet
-			log.SugaredLogger.Error("Bad Data Package Received: got %d ,expect 17767", const1)
+			log.SugaredLogger.Errorf("Bad Data Package Received: got %d ,expect 17767", const1)
 			break
 		}
 
@@ -96,7 +96,8 @@ func (s *Session) handleReceive(buffer []byte) {
 			log.SugaredLogger.Error("Bad Data Package Received: got %d ,expect -30293", const2)
 			break // Bad packet
 		}
-		// todo Handle
-		log.SugaredLogger.Info("handle", opcode)
+		// Handle
+		log.SugaredLogger.Info("handle: ", opcode)
+		Handle(s, opcode, header, payload)
 	}
 }
