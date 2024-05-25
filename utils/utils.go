@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"Go-Grasscutter/log"
 	"encoding/base64"
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -46,12 +45,8 @@ func Base64Encode(toEncode []byte) string {
 	return base64.StdEncoding.EncodeToString(toEncode)
 }
 
-func Base64Decode(toDecode string) []byte {
-	decodedData, err := base64.StdEncoding.DecodeString(toDecode)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-	}
-	return decodedData
+func Base64Decode(toDecode string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(toDecode)
 }
 
 func AbilityHash(str string) int {
