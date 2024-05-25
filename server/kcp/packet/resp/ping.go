@@ -7,7 +7,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func PacketPingRsp(clientSeq, time uint32) *base.BasePacket {
+func PacketPingRsp(clientSeq, time uint32) *base.Packet {
 	code := base.PingRsp
 
 	p := pb.PingRsp{
@@ -19,7 +19,7 @@ func PacketPingRsp(clientSeq, time uint32) *base.BasePacket {
 		return nil
 	}
 
-	packet := &base.BasePacket{
+	packet := &base.Packet{
 		Opcode: code,
 		Data:   data,
 	}

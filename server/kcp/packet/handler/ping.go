@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	session.Router.Store(uint16(base.PingReq), HandlerPingReq)
+	session.Router[base.PingReq] = HandlerPingReq
 }
 
 func HandlerPingReq(sess *session.Session, header, payload []byte) {

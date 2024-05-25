@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type BasePacket struct {
+type Packet struct {
 	const1            int
 	const2            int
 	ShouldEncrypt     bool
@@ -21,7 +21,7 @@ type BasePacket struct {
 	UseDispatchKey bool
 }
 
-func (b BasePacket) BuildHeader(clientSequence uint32) {
+func (b *Packet) BuildHeader(clientSequence uint32) {
 	if len(b.Header) > 0 && clientSequence == 0 {
 		return
 	}
@@ -37,7 +37,7 @@ func (b BasePacket) BuildHeader(clientSequence uint32) {
 	b.Header = head
 }
 
-func (b BasePacket) Build() []byte {
+func (b *Packet) Build() []byte {
 	b.const1 = 17767
 	b.const2 = -30293
 	b.ShouldEncrypt = true

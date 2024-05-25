@@ -1,7 +1,6 @@
 package session
 
 import (
-	"Go-Grasscutter/config"
 	"Go-Grasscutter/game/player"
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
@@ -23,7 +22,7 @@ type Session struct {
 	LastClientSeq uint32
 }
 
-func (s *Session) Send(packet *base.BasePacket) {
+func (s *Session) Send(packet *base.Packet) {
 	if packet == nil {
 		return
 	}
@@ -51,7 +50,6 @@ func (s *Session) Send(packet *base.BasePacket) {
 	_, err := s.Tunnel.Write(bytes)
 	if err != nil {
 		log.SugaredLogger.Debug("Unable to send packet to client:", err)
-		return
 	}
 }
 
@@ -64,9 +62,9 @@ func NewGameSession() *Session {
 		LastPingTime:  time.Now().UnixMilli(),
 		LastClientSeq: 10,
 	}
-	if config.Conf.Server.Game.UseUniquePacketKey {
-		g.EncryptKey, g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(make([]byte, 4096))
-	}
+	//if config.Conf.Server.Game.UseUniquePacketKey {
+	//	g.EncryptKey, g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(make([]byte, 4096))
+	//}
 	return g
 }
 

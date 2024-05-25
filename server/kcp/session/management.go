@@ -43,12 +43,11 @@ func (s *Session) Connected() {
 func (s *Session) handleReceive(buffer []byte) {
 	var buf *bytes.Buffer
 	// Decrypt and turn back into a packet
-	//if s.UseSecretKey {
-	//	buf = bytes.NewBuffer(crypto.Xor(buffer, s.EncryptKey))
-	//} else {
-	//	buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
-	//}
-	buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
+	if s.UseSecretKey {
+		buf = bytes.NewBuffer(crypto.Xor(buffer, s.EncryptKey))
+	} else {
+		buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
+	}
 	for buf.Len() > 0 {
 		if buf.Len() < 12 {
 			break
