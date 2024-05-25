@@ -12,18 +12,18 @@ import (
 )
 
 type Account struct {
-	ID             string   `bson:"_id"`
-	Username       string   `bson:"username" index:"unique"`
-	ReservedPlayer int      `bson:"reservedPlayerId"`
-	Email          string   `bson:"email"`
-	Token          string   `bson:"token"`
-	SessionKey     string   `bson:"sessionKey"`
-	Permissions    []string `bson:"permissions"`
-	Locale         string   `bson:"locale"`
-	BanReason      string   `bson:"banReason"`
-	BanEndTime     int      `bson:"banEndTime"`
-	BanStartTime   int      `bson:"banStartTime"`
-	IsBanned       bool     `bson:"isBanned"`
+	ID               string   `bson:"_id"`
+	Username         string   `bson:"username" index:"unique"`
+	ReservedPlayerId int      `bson:"reservedPlayerId"`
+	Email            string   `bson:"email"`
+	Token            string   `bson:"token"`
+	SessionKey       string   `bson:"sessionKey"`
+	Permissions      []string `bson:"permissions"`
+	Locale           string   `bson:"locale"`
+	BanReason        string   `bson:"banReason"`
+	BanEndTime       int      `bson:"banEndTime"`
+	BanStartTime     int      `bson:"banStartTime"`
+	IsBanned         bool     `bson:"isBanned"`
 }
 
 func (a *Account) SaveAccount() {
@@ -41,7 +41,7 @@ func (a *Account) GetEmail() string {
 
 func (a *Account) GenerateSessionKey() string {
 	sessionKey := utils.BytesToHex(crypto.CreateSessionKey(32))
-	// save in db
+	// Save in db
 	a.SessionKey = sessionKey
 	a.SaveAccount()
 	return sessionKey
@@ -49,7 +49,7 @@ func (a *Account) GenerateSessionKey() string {
 
 func (a *Account) GenerateLoginToken() string {
 	token := utils.BytesToHex(crypto.CreateSessionKey(32))
-	// save in db
+	// Save in db
 	a.Token = token
 	a.SaveAccount()
 	return token

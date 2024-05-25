@@ -14,15 +14,19 @@ import (
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
 	"context"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
+
+const collName = "players"
 
 type Player struct {
 	ID               int    `bson:"_id"`
 	AccountID        string `bson:"accountId" index:"unique"`
 	Account          *Account
 	Session          *kcp.UDPSession
-	SessionKey       string          `bson:"-"`
+	SessionKey       string
 	Nickname         string          `bson:"nickname"`
 	Signature        string          `bson:"signature"`
 	HeadImage        int             `bson:"headImage"`
@@ -74,36 +78,102 @@ type Player struct {
 	// Player managers go here
 
 	// Manager data (Save-able to the database)
-	// achievements todo
+	// todo achievements
 	PlayerProfile         *friends.PlayerProfile   `bson:"playerProfile"`
 	TeamManager           *TeamManager             `bson:"teamManager"`
 	GachaInfo             *gacha.PlayerGachaInfo   `bson:"gachaInfo"`
 	CollectionRecordStore *PlayerCollectionRecords `bson:"collectionRecordStore"`
 	ShopLimit             []*shop.ShopLimit        `bson:"shopLimit"`
 
-	MoonCard          bool                        `bson:"moonCard"`
-	MoonCardDuration  int                         `bson:"moonCardDuration"`
-	SpringLastUsed    int64                       `bson:"springLastUsed"`
-	MapMarks          map[string]*mapmark.MapMark `bson:"mapMarks"`
-	NextResinRefresh  int                         `bson:"nextResinRefresh"`
-	ResinBuyCount     int                         `bson:"resinBuyCount"`
-	LastDailyReset    int                         `bson:"lastDailyReset"`
-	PlayerGameTime    int64                       `bson:"playerGameTime"`
-	PlayerProgress    *PlayerProgress             `bson:"playerProgress"`
-	ActiveQuestTimers []int                       `bson:"activeQuestTimers"`
-	// todo mainCharacterElement
-	cityInfoData *city.CityInfoData `bson:"cityInfoData"`
+	// todo home
+
+	MoonCard             bool                        `bson:"moonCard"`
+	MoonCardDuration     int                         `bson:"moonCardDuration"`
+	SpringLastUsed       int64                       `bson:"springLastUsed"`
+	MapMarks             map[string]*mapmark.MapMark `bson:"mapMarks"`
+	NextResinRefresh     int                         `bson:"nextResinRefresh"`
+	ResinBuyCount        int                         `bson:"resinBuyCount"`
+	LastDailyReset       int                         `bson:"lastDailyReset"`
+	PlayerGameTime       int64                       `bson:"playerGameTime"`
+	PlayerProgress       *PlayerProgress             `bson:"playerProgress"`
+	ActiveQuestTimers    []int                       `bson:"activeQuestTimers"`
+	MainCharacterElement string                      `bson:"mainCharacterElement"`
+	CityInfoData         *city.CityInfoData          `bson:"cityInfoData"`
 }
 
-func NewPlayer() *Player {
-	return &Player{}
+// Create
+func CreatePlayer(account *Account, sess *kcp.UDPSession) *Player {
+	p := &Player{
+		Account:   account,
+		AccountID: account.ID,
+		Session:   sess,
+		Nickname:  "Traveler",
+		Signature: "",
+	}
+	// todo applyProperties
+	// todo applyStartingSceneTags
+
+	return p
 }
 
-func LoadPlayer(id int) *Player {
+func (p *Player) LoadFromDatabase() {
+	// todo Load all Player managers From Database
+}
+
+func GetPlayerByAccount(account *Account) *Player {
 	p := &Player{}
-	err := db.DB.Collection("players").FindOne(context.Background(), bson.D{{"_id", id}}).Decode(p)
+	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"accountId", account.ID}}).Decode(p)
 	if err != nil {
+		if errors.Is(mongo.ErrNoDocuments, err) {
+			return nil
+		}
 		log.SugaredLogger.Error(err)
+		return nil
 	}
 	return p
+}
+
+func CheckIfExists(uid int) bool {
+	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"_id", uid}}).Err()
+	if err == nil {
+		return true
+	}
+	if !errors.Is(err, mongo.ErrNoDocuments) {
+		log.SugaredLogger.Error(err)
+		return false
+	}
+	return false
+}
+
+func GetNextPlayerId(reservedId int) int {
+	var id int
+	if reservedId > 0 && CheckIfExists(reservedId) {
+		id = reservedId
+	} else {
+		for CheckIfExists(id) {
+			id = db.GetNextId("Player")
+		}
+	}
+	return id
+}
+
+func (p *Player) GeneratePlayerUid(reservedId int) {
+	var id int
+	if reservedId > 0 && !CheckIfExists(reservedId) {
+		id = reservedId
+	} else {
+		for CheckIfExists(id) {
+			id = db.GetNextId("Player")
+		}
+	}
+	p.ID = id
+	go p.Save()
+}
+
+func (p *Player) Save() {
+	_, err := db.DB.Collection(collName).InsertOne(context.Background(), p)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return
+	}
 }
