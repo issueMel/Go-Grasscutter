@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/base64"
 	"github.com/cloudwego/hertz/pkg/app"
+	"time"
 )
 
 var (
@@ -58,4 +59,8 @@ func AbilityHash(str string) int {
 		v8++
 	}
 	return v7
+}
+
+func GetCurrentSeconds() int {
+	return time.Now().Second()
 }
