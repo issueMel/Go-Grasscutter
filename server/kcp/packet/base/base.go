@@ -21,6 +21,12 @@ type Packet struct {
 	UseDispatchKey bool
 }
 
+func NewPacketWithCode(opcode int) *Packet {
+	return &Packet{
+		Opcode: opcode,
+	}
+}
+
 func (b *Packet) BuildHeader(clientSequence uint32) {
 	if len(b.Header) > 0 && clientSequence == 0 {
 		return
