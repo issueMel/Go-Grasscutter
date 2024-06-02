@@ -1,6 +1,5 @@
 package config
 
-import "C"
 import (
 	_ "embed"
 	"github.com/spf13/viper"
