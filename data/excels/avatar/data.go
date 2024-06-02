@@ -4,7 +4,7 @@ var avatarResources = []string{
 	"AvatarExcelConfigData.json",
 }
 
-type AvatarData struct {
+type Data struct {
 	IconName         string `json:"iconName,omitempty"`
 	BodyType         string `json:"bodyType,omitempty"`
 	QualityType      string `json:"qualityType,omitempty"`
