@@ -92,7 +92,7 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 	sess.Player = p
 
 	// todo Load player from database
-	// player.loadFromDatabase();
+	sess.Player.LoadFromDatabase()
 
 	// Set session state
 	sess.UseSecretKey = true
