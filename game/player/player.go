@@ -2,10 +2,13 @@ package player
 
 import (
 	"Go-Grasscutter/db"
+	"Go-Grasscutter/game/achievement"
+	"Go-Grasscutter/game/avatar"
 	"Go-Grasscutter/game/city"
 	"Go-Grasscutter/game/expedition"
 	"Go-Grasscutter/game/friends"
 	"Go-Grasscutter/game/gacha"
+	"Go-Grasscutter/game/inventory"
 	"Go-Grasscutter/game/managers/cooking"
 	"Go-Grasscutter/game/managers/forging"
 	"Go-Grasscutter/game/managers/mapmark"
@@ -13,10 +16,12 @@ import (
 	"Go-Grasscutter/game/world"
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
+	"Go-Grasscutter/utils"
 	"context"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"sync"
 )
 
 const collName = "players"
@@ -37,7 +42,7 @@ type Player struct {
 	PrevScene        int             `bson:"prevScene"`
 	Rotation         *world.Position `bson:"rotation"`
 	Birthday         *PlayerBirthday `bson:"birthday"`
-	Codex            PlayerCodex     `bson:"codex"`
+	Codex            *PlayerCodex    `bson:"codex"`
 	ShowAvatars      bool            `bson:"showAvatars"`
 	ShowAvatarList   []int           `bson:"showAvatarList"`
 	ShowNameCardList []int           `bson:"showNameCardList"`
@@ -52,6 +57,7 @@ type Player struct {
 	UnlimitedStamina bool `bson:"unlimitedStamina"`
 
 	NameCardList              []int                                   `bson:"nameCardList"`
+	FlyCloakList              []int                                   `bson:"flyCloakList"`
 	CostumeList               []int                                   `bson:"costumeList"`
 	RewardedLevels            []int                                   `bson:"rewardedLevels"`
 	HomeRewardedLevels        []int                                   `bson:"homeRewardedLevels"`
@@ -74,11 +80,20 @@ type Player struct {
 
 	NextGuid int64
 	PeerId   int
+	// world
+	// curHomeWorld
+	HasSentInitPacketInHome bool
+	// scene
+	WeatherId int
+	// climate
+	AreaId   int
+	AreaType int
 
 	// Player managers go here
-
+	Avatars   *avatar.Storage
+	Inventory *inventory.Inventory
 	// Manager data (Save-able to the database)
-	// todo achievements
+	Achievements          *achievement.Achievements
 	PlayerProfile         *friends.PlayerProfile   `bson:"playerProfile"`
 	TeamManager           *TeamManager             `bson:"teamManager"`
 	GachaInfo             *gacha.PlayerGachaInfo   `bson:"gachaInfo"`
@@ -117,7 +132,58 @@ func CreatePlayer(account *Account, sess *kcp.UDPSession) *Player {
 }
 
 func (p *Player) LoadFromDatabase() {
+	if p.TeamManager == nil {
+		p.TeamManager = &TeamManager{}
+	}
+
+	if p.Codex == nil {
+		p.Codex = &PlayerCodex{}
+	}
+
+	if p.PlayerProfile == nil || p.PlayerProfile.Uid == 0 {
+		// syncWithCharacter
+		p.PlayerProfile = &friends.PlayerProfile{
+			Uid:       p.ID,
+			NameCard:  p.NameCardID,
+			AvatarId:  p.HeadImage,
+			Name:      p.Nickname,
+			Signature: p.Signature,
+			//PlayerLevel:      ,
+			//WorldLevel:       ,
+			LastActiveTime:  utils.GetCurrentSeconds(),
+			EnterHomeOption: 0, // todo
+		}
+	}
 	// todo Load all Player managers From Database
+	// Load from db
+	wait := &sync.WaitGroup{}
+
+	utils.DoAllFunc(wait,
+		func() {
+			p.Achievements = achievement.GetByPlayerUid(p.ID)
+		},
+		// p.Avatars.LoadFromDatabase,
+	)
+
+	// Wait for all tasks to finish.
+	wait.Wait()
+}
+
+func (p *Player) OnLogin() {
+	if p.SceneTags == nil || len(p.SceneTags) == 0 {
+		// todo applyStartingSceneTags()
+	}
+
+	// todo GameHome
+
+	// todo Create world
+
+	// todo Multiplayer setting
+
+	// todo Execute daily reset logic if this is a new day.
+
+	// todo Rewind active quests, and put the player to a rewind position it finds (if any) of an active quest
+
 }
 
 func GetPlayerByAccount(account *Account) *Player {
@@ -130,6 +196,19 @@ func GetPlayerByAccount(account *Account) *Player {
 		log.SugaredLogger.Error(err)
 		return nil
 	}
+
+	// init management
+	p.Avatars = &avatar.Storage{
+		Uid:         p.ID,
+		Avatars:     make(map[int]*avatar.Avatar),
+		AvatarsGuid: make(map[int64]*avatar.Avatar),
+	}
+	p.Inventory = &inventory.Inventory{
+		Uid:            p.ID,
+		Store:          make(map[int64]*inventory.GameItem),
+		InventoryTypes: make(map[int]*inventory.InventoryTab),
+	}
+
 	return p
 }
 
