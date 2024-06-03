@@ -4,6 +4,7 @@ import (
 	"Go-Grasscutter/db"
 	"Go-Grasscutter/game/achievement"
 	"Go-Grasscutter/game/avatar"
+	"Go-Grasscutter/game/battlepass"
 	"Go-Grasscutter/game/city"
 	"Go-Grasscutter/game/expedition"
 	"Go-Grasscutter/game/friends"
@@ -91,9 +92,11 @@ type Player struct {
 	AreaType int
 
 	// Player managers go here
-	Avatars      *avatar.Storage
-	Inventory    *inventory.Inventory
-	questManager *quest.Manager
+	Avatars           *avatar.Storage
+	Inventory         *inventory.Inventory
+	QuestManager      *quest.Manager
+	BattlePassManager *battlepass.Manager
+
 	// Manager data (Save-able to the database)
 	Achievements          *achievement.Achievements
 	PlayerProfile         *friends.PlayerProfile   `bson:"playerProfile"`
@@ -218,12 +221,16 @@ func (p *Player) ManagementInit() {
 		InventoryTypes: make(map[int]*inventory.InventoryTab),
 	}
 
-	p.questManager = &quest.Manager{
+	p.QuestManager = &quest.Manager{
 		MainQuests:          make(map[int]*quest.GameMainQuest),
 		AcceptProgressLists: make(map[int][]int),
 		LoggedQuests:        make([]int, 0),
-		LastHourCheck:       0,
-		LastDayCheck:        0,
+	}
+
+	p.BattlePassManager = &battlepass.Manager{
+		OwnerUid:     p.ID,
+		Missions:     make(map[int]*battlepass.Mission),
+		TakenRewards: make(map[int]*battlepass.Reward),
 	}
 }
 
