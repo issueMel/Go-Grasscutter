@@ -201,9 +201,6 @@ func queryRegionList(c context.Context, ctx *app.RequestContext) {
 		switch versionCode {
 		case "CNRELiOS", "CNRELWin", "CNRELAnd":
 			// Use the CN region list.
-			// todo QueryAllRegionsEvent
-
-			// Respond with the event result.
 			ctx.String(200, regionListResponseCN)
 		case "OSRELiOS", "OSRELWin", "OSRELAnd":
 			// Use the OS region list.

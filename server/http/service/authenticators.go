@@ -23,7 +23,6 @@ type PasswordAuthenticator struct {
 
 // Authenticate Handles the authentication request from the username and password form.
 func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
-	// todo redo if not user exit resp
 	resp := object.NewLoginResultJson()
 
 	requestData := request.PasswordRequest
