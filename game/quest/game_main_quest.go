@@ -2,6 +2,7 @@ package quest
 
 import (
 	"Go-Grasscutter/data/binout"
+	"Go-Grasscutter/generated/pb"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -17,4 +18,9 @@ type GameMainQuest struct {
 	QuestGroupSuites          []*GroupSuite            `bson:"questGroupSuites"`
 	SuggestTrackMainQuestList []int                    `bson:"suggestTrackMainQuestList"`
 	Talks                     map[int]*binout.TalkData `bson:"talks"`
+}
+
+func (g *GameMainQuest) ToProto(withChildQuests bool) *pb.ParentQuest {
+	// todo ParentQuest.ToProto()
+	return &pb.ParentQuest{}
 }
