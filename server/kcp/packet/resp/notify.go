@@ -1,6 +1,7 @@
 package resp
 
 import (
+	data2 "Go-Grasscutter/data"
 	"Go-Grasscutter/game/player"
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
@@ -137,5 +138,177 @@ func PacketAvatarDataNotify(player *player.Player) *base.Packet {
 		Opcode:            code,
 		ShouldBuildHeader: true,
 		Data:              data,
+	}
+}
+
+func PacketFinishedParentQuestNotify(player *player.Player) *base.Packet {
+	code := base.FinishedParentQuestNotify
+	msg := pb.FinishedParentQuestNotify{
+		ParentQuestList: make([]*pb.ParentQuest, 0),
+	}
+
+	for _, val := range player.QuestManager.MainQuests {
+		// todo ParentQuestState
+		if val.State != "PARENT_QUEST_STATE_CANCELED" {
+			msg.ParentQuestList = append(msg.ParentQuestList, val.ToProto(false))
+		}
+	}
+
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode:            code,
+		Data:              data,
+		ShouldBuildHeader: true,
+	}
+}
+
+func PacketBattlePassAllDataNotify(player *player.Player) *base.Packet {
+	code := base.BattlePassAllDataNotify
+	msg := pb.BattlePassAllDataNotify{
+		HaveCurSchedule: true,
+		CurSchedule:     player.BattlePassManager.GetScheduleProto(),
+	}
+
+	for _, missionData := range data2.GameData.BattlePassMissionDataMap {
+		// Don`t send invalid refresh types
+		if missionData.IsValidRefreshType() {
+			continue
+		}
+
+		// Check if player has mission in bp manager.
+		// If not, then add an empty proto from the mission data
+		val, ok := player.BattlePassManager.Missions[missionData.Id]
+		if ok {
+			msg.MissionList = append(msg.MissionList, val.ToProto())
+		} else {
+			msg.MissionList = append(msg.MissionList, missionData.ToProto())
+		}
+
+	}
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   data,
+	}
+}
+
+func PacketQuestListNotify(player *player.Player) *base.Packet {
+	code := base.QuestListNotify
+	msg := pb.QuestListNotify{
+		QuestList: make([]*pb.Quest, 0),
+	}
+
+	for _, child := range player.QuestManager.MainQuests {
+		for _, val := range child.ChildQuests {
+			// todo QuestState
+			if val.State != "QUEST_STATE_UNSTARTED" {
+				msg.QuestList = append(msg.QuestList, val.ToProto())
+			}
+		}
+	}
+
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode:            code,
+		ShouldBuildHeader: true,
+		Data:              data,
+	}
+}
+
+func PacketQuestGlobalVarNotify(player *player.Player) *base.Packet {
+	code := base.QuestGlobalVarNotify
+
+	msg := pb.QuestGlobalVarNotify{
+		VarList: make([]*pb.QuestGlobalVar, 0),
+	}
+
+	for key, val := range player.QuestGlobalVariables {
+		msg.VarList = append(msg.VarList, &pb.QuestGlobalVar{
+			Key:   uint32(key),
+			Value: int32(val),
+		})
+	}
+
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   data,
+	}
+}
+
+func PacketCodexDataFullNotify(player *player.Player) *base.Packet {
+	code := base.CodexDataFullNotify
+
+	msg := pb.CodexDataFullNotify{
+		TypeDataList: make([]*pb.CodexTypeData, 0), // todo CodexTypeData x 8
+	}
+
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode:            code,
+		ShouldBuildHeader: true,
+		Data:              data,
+	}
+}
+
+func PacketAllWidgetDataNotify(player *player.Player) *base.Packet {
+	code := base.AllWidgetDataNotify
+	msg := pb.AllWidgetDataNotify{
+		LunchBoxData:                      &pb.LunchBoxData{},
+		OneoffGatherPointDetectorDataList: make([]*pb.OneoffGatherPointDetectorData, 0),
+		// AllOneoffGatherPointDetectorDataList
+		PEOHMDJKMKO:             make([]*pb.WidgetCoolDownData, 0),
+		AnchorPointList:         make([]*pb.AnchorPointData, 0),
+		ClientCollectorDataList: make([]*pb.ClientCollectorData, 0),
+		// AllNormalCoolDownDataList
+		MCMDFPAFOIG: make([]*pb.WidgetCoolDownData, 0),
+		SlotList:    make([]*pb.WidgetSlotData, 0),
+	}
+
+	if player.WidgetID != 0 {
+		msg.SlotList = append(msg.SlotList,
+			&pb.WidgetSlotData{
+				IsActive:   true,
+				MaterialId: uint32(player.WidgetID),
+			},
+			&pb.WidgetSlotData{
+				Tag: pb.WidgetSlotTag_WIDGET_SLOT_TAG_ATTACH_AVATAR,
+			})
+	}
+
+	data, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   data,
 	}
 }

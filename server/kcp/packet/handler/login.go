@@ -58,14 +58,14 @@ func NotifyLogin(sess *session.Session) {
 	sess.Send(resp.PacketPlayerStoreNotify(sess.Player))
 	sess.Send(resp.PacketAvatarDataNotify(sess.Player))
 
-	//sess.Send()
-	//
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
+	//sess.Send() // this.getProgressManager().onPlayerLogin();
+
+	sess.Send(resp.PacketFinishedParentQuestNotify(sess.Player))
+	sess.Send(resp.PacketBattlePassAllDataNotify(sess.Player))
+	sess.Send(resp.PacketQuestListNotify(sess.Player))
+	sess.Send(resp.PacketQuestGlobalVarNotify(sess.Player))
+	sess.Send(resp.PacketCodexDataFullNotify(sess.Player))
+	sess.Send(resp.PacketAllWidgetDataNotify(sess.Player))
 	//
 	////Achievements
 	//sess.Send()
