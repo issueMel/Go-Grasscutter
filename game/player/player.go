@@ -12,6 +12,7 @@ import (
 	"Go-Grasscutter/game/managers/cooking"
 	"Go-Grasscutter/game/managers/forging"
 	"Go-Grasscutter/game/managers/mapmark"
+	"Go-Grasscutter/game/quest"
 	"Go-Grasscutter/game/shop"
 	"Go-Grasscutter/game/world"
 	"Go-Grasscutter/lib/kcp-go"
@@ -90,8 +91,9 @@ type Player struct {
 	AreaType int
 
 	// Player managers go here
-	Avatars   *avatar.Storage
-	Inventory *inventory.Inventory
+	Avatars      *avatar.Storage
+	Inventory    *inventory.Inventory
+	questManager *quest.Manager
 	// Manager data (Save-able to the database)
 	Achievements          *achievement.Achievements
 	PlayerProfile         *friends.PlayerProfile   `bson:"playerProfile"`
@@ -198,18 +200,31 @@ func GetPlayerByAccount(account *Account) *Player {
 	}
 
 	// init management
+	p.ManagementInit()
+
+	return p
+}
+
+func (p *Player) ManagementInit() {
 	p.Avatars = &avatar.Storage{
 		Uid:         p.ID,
 		Avatars:     make(map[int]*avatar.Avatar),
 		AvatarsGuid: make(map[int64]*avatar.Avatar),
 	}
+
 	p.Inventory = &inventory.Inventory{
 		Uid:            p.ID,
 		Store:          make(map[int64]*inventory.GameItem),
 		InventoryTypes: make(map[int]*inventory.InventoryTab),
 	}
 
-	return p
+	p.questManager = &quest.Manager{
+		MainQuests:          make(map[int]*quest.GameMainQuest),
+		AcceptProgressLists: make(map[int][]int),
+		LoggedQuests:        make([]int, 0),
+		LastHourCheck:       0,
+		LastDayCheck:        0,
+	}
 }
 
 func CheckIfExists(uid int) bool {
