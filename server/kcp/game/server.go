@@ -7,6 +7,7 @@ import (
 )
 
 type GameServer struct {
+	// todo check use RWMap or sync.Map
 	Players   sync.Map // id, player
 	PlayerNum atomic.Int32
 }
@@ -15,8 +16,8 @@ var Server = &GameServer{
 	Players: sync.Map{},
 }
 
-func (s *GameServer) AddPlayer(id int, player *player.Player) {
-	s.Players.Store(id, player)
+func (s *GameServer) RegisterPlayer(player *player.Player) {
+	s.Players.Store(player.ID, player)
 	s.PlayerNum.Add(1)
 }
 

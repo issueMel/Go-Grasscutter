@@ -107,8 +107,19 @@ type Player struct {
 
 	// todo home
 
-	MoonCard             bool                        `bson:"moonCard"`
-	MoonCardDuration     int                         `bson:"moonCardDuration"`
+	MoonCard bool `bson:"moonCard"`
+	// moonCardStartTime time.Duration
+	MoonCardDuration int `bson:"moonCardDuration"`
+	// moonCardGetTimes []int `bson:"moonCardGetTimes"`
+
+	Paused bool
+	// QueuedTeleport
+	EnterSceneToken int
+	// SceneLoadState
+	HasSentLoginPackets   bool
+	NextSendPlayerLocTime int64
+	// EnterHomeRequests map[int]any
+
 	SpringLastUsed       int64                       `bson:"springLastUsed"`
 	MapMarks             map[string]*mapmark.MapMark `bson:"mapMarks"`
 	NextResinRefresh     int                         `bson:"nextResinRefresh"`

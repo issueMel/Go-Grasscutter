@@ -3,6 +3,7 @@ package handler
 import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
+	"Go-Grasscutter/server/kcp/game"
 	"Go-Grasscutter/server/kcp/packet/base"
 	"Go-Grasscutter/server/kcp/packet/resp"
 	"Go-Grasscutter/server/kcp/session"
@@ -53,6 +54,7 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 }
 
 func NotifyLogin(sess *session.Session) {
+	// todo other manager send packet
 	sess.Send(resp.PacketPlayerDataNotify(sess.Player))
 	sess.Send(resp.PacketStoreWeightLimitNotify())
 	sess.Send(resp.PacketPlayerStoreNotify(sess.Player))
@@ -66,15 +68,17 @@ func NotifyLogin(sess *session.Session) {
 	sess.Send(resp.PacketQuestGlobalVarNotify(sess.Player))
 	sess.Send(resp.PacketCodexDataFullNotify(sess.Player))
 	sess.Send(resp.PacketAllWidgetDataNotify(sess.Player))
-	//
-	////Achievements
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
-	//sess.Send()
-	//
-	//sess.Send()
+
+	// Achievements
 	//sess.Send()
 
+	sess.Send(resp.PacketWidgetGadgetAllDataNotify())
+	sess.Send(resp.PacketCombineDataNotify(sess.Player.UnlockedCombines))
+	sess.Send(resp.PacketGetChatEmojiCollectionRsp(sess.Player.ChatEmojiIdList))
+
+	sess.Send(resp.PacketPlayerEnterSceneNotify(sess.Player))
+	sess.Send(resp.PacketPlayerLevelRewardUpdateNotify(sess.Player.RewardedLevels))
+
 	sess.State = session.Active
+	game.Server.RegisterPlayer(sess.Player)
 }
