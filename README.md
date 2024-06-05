@@ -65,3 +65,18 @@ npm run build
 ```
 
 You can find the output program in the root of the project folder.
+
+## Contribute
+
+Contributions to the project are welcome.
+
+### TIPS
+
+Present what you want to do at issues to avoid conflicts with other contributors.<br>
+You can also search for TODOs in the project to improve.
+
+### TODO
+
+- CHECK: changed or removed at a later date
+- ENHANCE: performance or memory footprint needs improvement
+- INCOMPLETE: function is incomplete

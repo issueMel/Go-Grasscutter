@@ -2,7 +2,7 @@
 
 [EN](../README.md) | [简中](README_zh-CN.md)
 ****
-this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutter).
+this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutter).<br>
 It only support for version CN 4.0.
 
 ## Current features
@@ -63,3 +63,18 @@ npm run build
 ```
 
 你可以在项目的根目录找到编译好的程序。
+
+## Contribute
+
+欢迎为该项目做出贡献。
+
+### TIPS
+
+在issue提出你想做的事情，避免与其他贡献者发生冲突。<br>
+也可以在寻找项目中的TODO进行完善。
+
+### TODO
+
+- CHECK: 会在后期做改动或移除
+- ENHANCE: 性能或占用需要改善
+- INCOMPLETE: 功能未完善
