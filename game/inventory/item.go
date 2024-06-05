@@ -37,7 +37,7 @@ func (item *GameItem) ToProto() *pb.Item {
 	prot := pb.Item{
 		Guid:   uint64(item.Guid),
 		ItemId: uint32(item.ItemId),
-		// todo Detail
+		// todo INCOMPLETE: Detail
 	}
 	return &prot
 }

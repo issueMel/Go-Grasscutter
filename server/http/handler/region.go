@@ -38,12 +38,12 @@ func Initialize() {
 	var head string
 	c := config.Conf
 	httpInfo := c.Server.Http
-	if httpInfo.Encryption.UseInRouting {
-		head = "https://"
-	} else {
-		head = "http://"
-	}
-	// todo use https
+	// todo INCOMPLETE: use https
+	//if httpInfo.Encryption.UseInRouting {
+	//	head = "https://"
+	//} else {
+	//	head = "http://"
+	//}
 	head = "http://"
 
 	dispatchDomain :=
@@ -57,6 +57,7 @@ func Initialize() {
 		configuredRegions = make([]*config.Region, 0) // todo raed config data
 	)
 
+	// todo CHECK: maybe dont need RunMode
 	// todo getRunMode() != ServerRunMode.HYBRID && set const "HYBRID"
 	if c.Server.RunMode != "HYBRID" && len(configuredRegions) == 0 {
 		log.SugaredLogger.Fatal("[Dispatch] There are no game servers available. Exiting due to unplayable state.")
@@ -86,7 +87,7 @@ func Initialize() {
 		servers = append(servers, identifier)
 
 		// Create a region info object.
-		// todo load config regions
+		// todo INCOMPLETE : load config regions
 		updatedQuery := &pb.QueryCurrRegionHttpRsp{
 			RegionInfo: &pb.RegionInfo{
 				GateserverIp:   region.Ip,
@@ -120,7 +121,7 @@ func Initialize() {
 		Sdkenv:        "2",
 		CheckDevice:   "false",
 		LoadPatch:     "false",
-		ShowException: "false", // todo GameConstants.DEBUG
+		ShowException: "false", // todo INCOMPLETE: GameConstants.DEBUG
 		RegionConfig:  "pm|fk|add",
 		DownloadMode:  "0",
 		CodeSwitch:    []int{3628}, // codeSwitch

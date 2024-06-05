@@ -37,7 +37,7 @@ func (PasswordAuthenticator) Authenticate(request *AuthenticationRequest) any {
 
 	// Get account from db.
 	account := player.GetAccountName(requestData.Account)
-	// todo autoCreate
+	// todo INCOMPLETE: autoCreate
 	successfulLogin = account != nil
 	if !successfulLogin {
 		log.SugaredLogger.Info(lang.Translate("messages.dispatch.account.account_login_create_error") + address)
@@ -132,7 +132,7 @@ func (SessionKeyAuthenticator) Authenticate(request *AuthenticationRequest) any 
 type SessionTokenValidator struct {
 }
 
-// todo SessionTokenValidator()
+// todo INCOMPLETE: SessionTokenValidator()
 func (SessionTokenValidator) Authenticate(request *AuthenticationRequest) any {
 	return nil
 }

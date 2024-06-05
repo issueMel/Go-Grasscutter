@@ -13,7 +13,7 @@ type GameMainQuest struct {
 	ParentQuestId             int                      `bson:"parentQuestId"`
 	QuestVars                 []int                    `bson:"questVars"`
 	TimeVar                   []int64                  `bson:"timeVar"`
-	State                     string                   `bson:"state"` // todo ParentQuestState
+	State                     string                   `bson:"state"` // todo INCOMPLETE: ParentQuestState
 	IsFinished                bool                     `bson:"isFinished"`
 	QuestGroupSuites          []*GroupSuite            `bson:"questGroupSuites"`
 	SuggestTrackMainQuestList []int                    `bson:"suggestTrackMainQuestList"`
@@ -21,6 +21,6 @@ type GameMainQuest struct {
 }
 
 func (g *GameMainQuest) ToProto(withChildQuests bool) *pb.ParentQuest {
-	// todo ParentQuest.ToProto()
+	// todo INCOMPLETE: ParentQuest.ToProto()
 	return &pb.ParentQuest{}
 }

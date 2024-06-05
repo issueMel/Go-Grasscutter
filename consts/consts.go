@@ -39,22 +39,22 @@ var (
 	DefaultTeamAbilityStrings = []string{
 		"Ability_Avatar_Dive_Team",
 	}
-	// todo SparseSet
+	// todo INCOMPLETE: SparseSet
 	IllegalWeapons = []string{
 		"10000-10008", "11411", "11506-11508", "12505", "12506", "12508", "12509",
 		"13503", "13506", "14411", "14503", "14505", "14508", "15504-15506",
 	}
-	// todo SparseSet
+	// todo INCOMPLETE: SparseSet
 	IllegalRelics = []string{
 		"20001", "23300-23340", "23383-23385", "78310-78554", "99310-99554",
 	}
-	// todo SparseSet
+	// todo INCOMPLETE: SparseSet
 	IllegalItems = []string{
 		"100086", "100087", "100100-101000", "101106-101110", "101306", "101500-104000",
 		"105001", "105004", "106000-107000", "107011", "108000", "109000-110000",
 		"115000-130000", "200200-200899", "220050", "220054",
 	}
-	DefaultAbilityHashes = []int{} // todo Arrays.stream(DEFAULT_ABILITY_STRINGS).mapToInt(Utils::abilityHash).toArray()
+	DefaultAbilityHashes = []int{} // todo INCOMPLETE: Arrays.stream(DEFAULT_ABILITY_STRINGS).mapToInt(Utils::abilityHash).toArray()
 	DefaultAbilityName   = utils.AbilityHash("Default")
 )
 

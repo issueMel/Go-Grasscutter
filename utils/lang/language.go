@@ -14,7 +14,7 @@ func LoadLanguage() {
 	L = viper.New()
 	L.AddConfigPath("./")
 	prefix := "resources/languages/"
-	// todo use config code
+	// todo INCOMPLETE: use config code
 	//r, err := utils.GetResource().ReadFile(prefix + config.Conf.Language.Language + ".json")
 	code, err := getLanguageCode()
 	r, err := utils.GetResource().ReadFile(prefix + code + ".json")

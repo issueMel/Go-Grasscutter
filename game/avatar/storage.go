@@ -23,11 +23,11 @@ func (s *Storage) LoadFromDatabase() {
 	avatars := getAvatars(s.Uid)
 
 	for _, avatar := range avatars {
-		// todo GameData
+		// todo INCOMPLETE: GameData
 
-		// todo Set ownerships
+		// todo INCOMPLETE: Set ownerships
 
-		// todo Force recalc of const boosted skills
+		// todo INCOMPLETE: Force recalc of const boosted skills
 
 		// Add to avatar storage
 		s.Avatars[avatar.AvatarId] = avatar

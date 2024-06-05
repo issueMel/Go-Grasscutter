@@ -7,7 +7,7 @@ import (
 )
 
 type GameServer struct {
-	// todo check use RWMap or sync.Map
+	// todo CHECK: use RWMap or sync.Map
 	Players   sync.Map // id, player
 	PlayerNum atomic.Int32
 }

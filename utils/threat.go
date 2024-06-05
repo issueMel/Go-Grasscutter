@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-// todo do we need threat pool ?
+// todo CHECK: need threat pool ?
 
 func DoAllFunc(wait *sync.WaitGroup, fn ...func()) {
 	l := len(fn)

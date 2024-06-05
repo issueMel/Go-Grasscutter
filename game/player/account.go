@@ -27,7 +27,7 @@ type Account struct {
 }
 
 func (a *Account) SaveAccount() {
-	// todo async store data
+	// todo INCOMPLETE: async store data
 	db.DB.Collection("accounts").ReplaceOne(context.Background(), bson.M{"_id": a.ID}, a)
 }
 

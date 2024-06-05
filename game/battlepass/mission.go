@@ -12,8 +12,8 @@ func (m *Mission) ToProto() *pb.BattlePassMission {
 	return &pb.BattlePassMission{
 		MissionId:   uint32(m.Id),
 		CurProgress: uint32(m.Progress),
-		//TotalProgress: , // todo get from manager
+		//TotalProgress: , // todo INCOMPLETE: get from manager
 		MissionStatus: pb.BattlePassMission_MissionStatus(pb.BattlePassMission_MissionStatus_value[m.Status]),
-		// MissionType: , // todo get from manager
+		// MissionType: , // todo INCOMPLETE: get from manager
 	}
 }

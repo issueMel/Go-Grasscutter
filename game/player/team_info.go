@@ -8,6 +8,6 @@ type TeamInfo struct {
 }
 
 func (t *TeamInfo) ToProto() *pb.AvatarTeam {
-	// todo TeamInfo ToProto()
+	// todo INCOMPLETE: TeamInfo ToProto()
 	return &pb.AvatarTeam{}
 }

@@ -16,14 +16,14 @@ func PacketGetPlayerTokenRsp(sess *session.Session, encryptedSeed, encryptedSeed
 		Uid:                    uint32(sess.Player.ID),
 		Token:                  sess.Account.Token,
 		AccountType:            1,
-		IsProficientPlayer:     true, // todo
+		IsProficientPlayer:     true, // todo INCOMPLETE
 		SecretKeySeed:          sess.EncryptSeed,
 		SecurityCmdBuffer:      crypto.EncryptSeedBuffer,
 		PlatformType:           3,
 		ChannelId:              1,
 		CountryCode:            "US",
 		ClientVersionRandomKey: "c25-314dd05b0b5f",
-		ClientIpStr:            "127.0.0.1", // todo sess.Tunnel.RemoteAddr().String()
+		ClientIpStr:            "127.0.0.1", // todo INCOMPLETE: addr
 		ServerRandKey:          encryptedSeed,
 		Sign:                   encryptedSeedSign,
 	}
@@ -45,7 +45,7 @@ func PacketGetPlayerTokenBannedRsp(sess *session.Session, retcode int, msg strin
 	code := base.GetPlayerTokenRsp
 	p := pb.GetPlayerTokenRsp{
 		Uid:                uint32(sess.Player.ID),
-		IsProficientPlayer: true, // todo
+		IsProficientPlayer: true, // todo INCOMPLETE
 		Retcode:            int32(retcode),
 		Msg:                msg,
 		BlackUidEndTime:    uint32(blackEndTime),

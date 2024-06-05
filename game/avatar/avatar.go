@@ -47,6 +47,6 @@ type Avatar struct {
 }
 
 func (a *Avatar) ToProto() *pb.AvatarInfo {
-	// todo ToProto()
+	// todo INCOMPLETE: ToProto()
 	return &pb.AvatarInfo{}
 }

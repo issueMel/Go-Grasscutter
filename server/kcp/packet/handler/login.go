@@ -44,7 +44,7 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 		sess.State = session.PickingCharacter
 		sess.Send(base.NewPacketWithCode(base.DoSetPlayerBornDataNotify))
 	} else {
-		// todo onLogin()
+		// todo INCOMPLETE: onLogin()
 		p.OnLogin()
 		NotifyLogin(sess)
 	}
@@ -54,7 +54,7 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 }
 
 func NotifyLogin(sess *session.Session) {
-	// todo other manager send packet
+	// todo INCOMPLETE: other manager send packet
 	sess.Send(resp.PacketPlayerDataNotify(sess.Player))
 	sess.Send(resp.PacketStoreWeightLimitNotify())
 	sess.Send(resp.PacketPlayerStoreNotify(sess.Player))

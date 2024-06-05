@@ -8,7 +8,7 @@ type SkillData struct {
 	TriggerID          int
 	IsAttackCameraLock bool
 	ProudSkillGroupId  int
-	CostElemType       any // todo ElementType
+	CostElemType       any // todo INCOMPLETE: ElementType
 	NameTextMapHash    int64
 	DescTextMapHash    int64
 	AbilityName        string

@@ -14,7 +14,7 @@ type SkillDepotData struct {
 
 	// Transient
 	EnergySkillData  *SkillData
-	ElementType      any // todo ElementType
+	ElementType      any // todo INCOMPLETE: ElementType
 	Abilities        []int
 	TalentCostItemId int
 }

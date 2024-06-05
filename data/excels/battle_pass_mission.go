@@ -8,12 +8,12 @@ type BattlePassMissionData struct {
 	ScheduleId    int
 	Progress      int
 	TriggerConfig TriggerConfig
-	RefreshType   string // todo BattlePassMissionRefreshType
+	RefreshType   string // todo INCOMPLETE: BattlePassMissionRefreshType
 	MainParams    map[int]struct{}
 }
 
 type TriggerConfig struct {
-	TriggerType string // todo WatcherTriggerType
+	TriggerType string // todo INCOMPLETE: WatcherTriggerType
 	ParamList   []string
 }
 
@@ -33,7 +33,7 @@ func (b *BattlePassMissionData) ToProto() *pb.BattlePassMission {
 	}
 
 	if len(b.RefreshType) != 0 {
-		// todo BattlePassMissionRefreshType
+		// todo INCOMPLETE: BattlePassMissionRefreshType
 	}
 
 	return prot

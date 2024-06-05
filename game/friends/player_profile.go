@@ -1,5 +1,6 @@
 package friends
 
+// todo CHECK: all can get from player, need PlayerProfile ?
 type PlayerProfile struct {
 	Uid              int    `bson:"uid"`
 	NameCard         int    `bson:"nameCard"`
@@ -11,5 +12,5 @@ type PlayerProfile struct {
 	LastActiveTime   int    `bson:"lastActiveTime"`
 	IsInDuel         bool   `bson:"isInDuel"`
 	IsDuelObservable bool   `bson:"isDuelObservable"`
-	EnterHomeOption  int    `bson:"enterHomeOption"`
+	EnterHomeOption  int    `bson:"enterHomeOption"` // todo INCOMPLETE: GameHome
 }

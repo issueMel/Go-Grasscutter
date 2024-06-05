@@ -43,7 +43,7 @@ func ApplyGenericHandler(r *server.Hertz) {
 	// /perf/config/verify?device_id=xxx&platform=x&name=xxx
 	r.Any("/perf/config/verify", Response("{\"code\":0}"))
 
-	// todo webstatic-sea.hoyoverse.com
+	// todo INCOMPLETE: webstatic-sea.hoyoverse.com
 	//javalin.get("/admin/mi18n/plat_oversea/*", new WebStaticVersionResponse());
 	//javalin.get("/status/server", GenericHandler::serverStatus);
 }

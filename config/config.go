@@ -18,7 +18,7 @@ func InitConfig() {
 	_, err := os.Stat(filepath)
 	// If no configuration in the directory.
 	// Generate the configuration.
-	// todo Generate without config.json
+	// todo INCOMPLETE: Generate without config.json
 	if err != nil {
 		if os.IsNotExist(err) {
 			err := os.WriteFile(filepath, config, 0644)
