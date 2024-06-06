@@ -1,7 +1,9 @@
 /.idea/
 
-Go-Grasscutter.iml
+*.iml
 
 /logs/
 
-config.json
+*.json
+
+/resources/
