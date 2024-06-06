@@ -1,8 +1,11 @@
 package resp
 
 import (
+	"Go-Grasscutter/config"
 	data2 "Go-Grasscutter/data"
 	"Go-Grasscutter/game/player"
+	"Go-Grasscutter/game/pros"
+	"Go-Grasscutter/game/quest/enum"
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
@@ -49,13 +52,14 @@ func PacketPlayerDataNotify(player *player.Player) *base.Packet {
 
 func PacketStoreWeightLimitNotify() *base.Packet {
 	code := base.StoreWeightLimitNotify
-	// todo need config ?
+
+	inventoryLimits := config.Conf.Server.Game.GameOptions.InventoryLimits
 	msg := pb.StoreWeightLimitNotify{
-		WeightLimit:         30000,
-		FurnitureCountLimit: 2000,
-		WeaponCountLimit:    20000,
-		ReliquaryCountLimit: 2000,
-		MaterialCountLimit:  2000,
+		WeightLimit:         uint32(inventoryLimits.All),
+		FurnitureCountLimit: uint32(inventoryLimits.Furniture),
+		WeaponCountLimit:    uint32(inventoryLimits.Weapons),
+		ReliquaryCountLimit: uint32(inventoryLimits.Relics),
+		MaterialCountLimit:  uint32(inventoryLimits.Materials),
 		StoreType:           pb.StoreType_STORE_TYPE_PACK,
 	}
 	data, err := proto.Marshal(&msg)
@@ -156,8 +160,7 @@ func PacketFinishedParentQuestNotify(player *player.Player) *base.Packet {
 	}
 
 	for _, val := range player.QuestManager.MainQuests {
-		// todo ParentQuestState
-		if val.State != "PARENT_QUEST_STATE_CANCELED" {
+		if val.State != enum.ParentQuestState_name[enum.PARENT_QUEST_STATE_CANCELED] {
 			msg.ParentQuestList = append(msg.ParentQuestList, val.ToProto(false))
 		}
 	}
@@ -218,8 +221,7 @@ func PacketQuestListNotify(player *player.Player) *base.Packet {
 
 	for _, child := range player.QuestManager.MainQuests {
 		for _, val := range child.ChildQuests {
-			// todo QuestState
-			if val.State != "QUEST_STATE_UNSTARTED" {
+			if val.State != enum.QuestState_name[enum.QUEST_STATE_UNSTARTED] {
 				msg.QuestList = append(msg.QuestList, val.ToProto())
 			}
 		}
@@ -389,28 +391,28 @@ func PacketGetChatEmojiCollectionRsp(emojiIds []int) *base.Packet {
 }
 
 // todo implement other PacketPlayerEnterSceneNotify
-func PacketPlayerEnterSceneNotify(player *player.Player) *base.Packet {
+func PacketPlayerEnterSceneNotify(p *player.Player) *base.Packet {
 	code := base.PlayerEnterSceneNotify
-	// todo player.SceneLoadState = "LOADING"
-	player.EnterSceneToken = rand.Intn(99999-1000) + 1000
+	p.SceneLoadState = player.LOADING
+	p.EnterSceneToken = rand.Intn(99999-1000) + 1000
 
 	msg := pb.PlayerEnterSceneNotify{
-		SceneId:         uint32(player.SceneID),
-		Pos:             player.Position.ToProto(),
+		SceneId:         uint32(p.SceneID),
+		Pos:             p.Position.ToProto(),
 		SceneBeginTime:  uint64(time.Now().Unix()),
 		Type:            pb.EnterType_ENTER_TYPE_SELF,
-		TargetUid:       uint32(player.ID),
-		EnterSceneToken: uint32(player.EnterSceneToken),
-		// todo WorldLevel: player.Properties.
-		EnterReason:            1,                           // todo  enum EnterReason
-		IsFirstLoginEnterScene: !player.HasSentLoginPackets, // todo player.hasSentLoginPackets
+		TargetUid:       uint32(p.ID),
+		EnterSceneToken: uint32(p.EnterSceneToken),
+		// todo WorldLevel: p.Properties.
+		EnterReason:            uint32(pros.Login),
+		IsFirstLoginEnterScene: !p.HasSentLoginPackets,
 		WorldType:              1,
 		SceneTransaction: fmt.Sprint("3-",
-			player.ID,
+			p.ID,
 			"-",
 			int(time.Now().UnixMilli()/1000),
 			"-",
-			18402), // todo improve splice strings performance
+			18402), // todo ENHANCE: improve splice strings performance
 	}
 
 	data, err := proto.Marshal(&msg)
@@ -419,9 +421,9 @@ func PacketPlayerEnterSceneNotify(player *player.Player) *base.Packet {
 		return nil
 	}
 
-	// todo move player.HasSentLoginPackets to another location
+	// todo move p.HasSentLoginPackets to another location
 	// First notify packets sent
-	player.HasSentLoginPackets = true
+	p.HasSentLoginPackets = true
 
 	return &base.Packet{
 		Opcode: code,
