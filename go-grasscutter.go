@@ -6,14 +6,13 @@ import (
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/http/router"
 	"Go-Grasscutter/server/kcp"
-
 	"Go-Grasscutter/utils"
 	"Go-Grasscutter/utils/crypto"
 	"Go-Grasscutter/utils/lang"
 	"embed"
 )
 
-//go:embed resources/*
+//go:embed res/*
 var resource embed.FS
 
 func main() {

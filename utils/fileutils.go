@@ -14,7 +14,7 @@ func GetResource() *embed.FS {
 }
 func ReadResource(resourcePath string) []byte {
 	// filepath.Join() give wrong path in Windows with embed
-	data, err := r.ReadFile("resources" + resourcePath)
+	data, err := r.ReadFile("res" + resourcePath)
 	if err != nil {
 		panic(err)
 	}
