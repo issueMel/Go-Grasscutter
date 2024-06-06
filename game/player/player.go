@@ -114,8 +114,8 @@ type Player struct {
 
 	Paused bool
 	// QueuedTeleport
-	EnterSceneToken int
-	// SceneLoadState
+	EnterSceneToken       int
+	SceneLoadState        SceneLoadState
 	HasSentLoginPackets   bool
 	NextSendPlayerLocTime int64
 	// EnterHomeRequests map[int]any
@@ -130,6 +130,10 @@ type Player struct {
 	ActiveQuestTimers    []int                       `bson:"activeQuestTimers"`
 	MainCharacterElement string                      `bson:"mainCharacterElement"`
 	CityInfoData         *city.CityInfoData          `bson:"cityInfoData"`
+}
+
+func NewPlayer(session *kcp.UDPSession) {
+
 }
 
 // Create
@@ -225,6 +229,7 @@ func GetPlayerByAccount(account *Account) *Player {
 	return p
 }
 
+// todo CHECK: move to NewPlayer()
 func (p *Player) ManagementInit() {
 	p.Avatars = &avatar.Storage{
 		Uid:         p.ID,

@@ -13,7 +13,7 @@ type GameMainQuest struct {
 	ParentQuestId             int                      `bson:"parentQuestId"`
 	QuestVars                 []int                    `bson:"questVars"`
 	TimeVar                   []int64                  `bson:"timeVar"`
-	State                     string                   `bson:"state"` // todo INCOMPLETE: ParentQuestState
+	State                     string                   `bson:"state"` // enum.ParentQuestState
 	IsFinished                bool                     `bson:"isFinished"`
 	QuestGroupSuites          []*GroupSuite            `bson:"questGroupSuites"`
 	SuggestTrackMainQuestList []int                    `bson:"suggestTrackMainQuestList"`
