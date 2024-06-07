@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// resources/languages
+// res/languages
 var L *viper.Viper
 
 func LoadLanguage() {

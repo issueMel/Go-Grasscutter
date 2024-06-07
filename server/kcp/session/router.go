@@ -12,5 +12,6 @@ func Handle(sess *Session, opcode uint16, header, payload []byte) {
 		log.SugaredLogger.Errorf("router %d not exist\n", opcode)
 		return
 	}
+	// todo ENHANCE: fix session logic
 	f(sess, header, payload)
 }
