@@ -7,8 +7,8 @@ import (
 )
 
 var GameData *Data = &Data{
-	AvatarDataMap:            make(map[int]*avatar.Data),
-	AvatarSkillDepotDataMap:  make(map[int]*avatar.SkillDepotData),
+	AvatarDataMap:            avatar.LoadAvatarData(),
+	AvatarSkillDepotDataMap:  avatar.LoadAvatarSkillDepotData(),
 	BattlePassMissionDataMap: excels.LoadBattlePassMissionData(),
 	SceneTagDataMap:          scene.LoadSceneTagData(),
 	OpenStateList:            excels.LoadOpenState(),
