@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Go-Grasscutter/config"
+	_ "Go-Grasscutter/config"
 	"Go-Grasscutter/db"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/http/router"
@@ -20,7 +20,7 @@ func main() {
 	// Load server resource.
 	utils.InitResource(resource)
 	// Load server configuration.
-	config.InitConfig()
+
 	// Init log system.
 	log.InitLogger()
 	// Load translation files.

@@ -13,6 +13,10 @@ var (
 	Conf *Config
 )
 
+func init() {
+	InitConfig()
+}
+
 func InitConfig() {
 	filepath := "config.json"
 	_, err := os.Stat(filepath)
