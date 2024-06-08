@@ -25,7 +25,8 @@ func (s *Session) Connected() {
 
 	// remove session when error
 	defer Management.Delete(conn)
-
+	// todo ENHANCE: kick after save()
+	// defer game.Server.KickPlayer(s.Player.ID)
 	for {
 		n, e := conn.Read(buffer)
 		if e != nil {

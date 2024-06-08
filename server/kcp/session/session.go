@@ -1,6 +1,7 @@
 package session
 
 import (
+	"Go-Grasscutter/config"
 	"Go-Grasscutter/game/player"
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
@@ -62,9 +63,9 @@ func NewGameSession() *Session {
 		LastPingTime:  time.Now().UnixMilli(),
 		LastClientSeq: 10,
 	}
-	//if config.Conf.Server.Game.UseUniquePacketKey {
-	//	g.EncryptKey, g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(make([]byte, 4096))
-	//}
+	if config.Conf.Server.Game.UseUniquePacketKey {
+		g.EncryptKey, g.EncryptSeed = crypto.GenerateEncryptKeyAndSeed(make([]byte, 4096))
+	}
 	return g
 }
 

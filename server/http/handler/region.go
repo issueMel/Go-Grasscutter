@@ -188,7 +188,6 @@ func ApplyRegionHandler(r *server.Hertz) {
 	{
 		regionGroups.GET("/query_region_list", queryRegionList)
 		// login/v2 -> /query_cur_region
-		regionGroups.GET("/query_cur_region", queryCurrentRegion)
 		regionGroups.GET("/query_cur_region/:region", queryCurrentRegion)
 	}
 
@@ -268,7 +267,7 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 					StopServer: &pb.StopServerInfo{
 						StopBeginTime: uint32(time.Now().Unix()),
 						StopEndTime:   uint32(time.Now().Unix() + 1),
-						Url:           "https://discord.gg/T5vZU6UyeG",
+						Url:           "https://github.com/issueMel/Go-Grasscutter/issues",
 						ContentMsg:    contentMsg,
 					},
 				},
