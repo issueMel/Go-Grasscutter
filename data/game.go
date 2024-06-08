@@ -12,6 +12,7 @@ var GameData *Data = &Data{
 	BattlePassMissionDataMap: excels.LoadBattlePassMissionData(),
 	SceneTagDataMap:          scene.LoadSceneTagData(),
 	OpenStateList:            excels.LoadOpenState(),
+	ItemDataMap:              excels.LoadItemData(),
 }
 
 type Data struct {
@@ -20,4 +21,5 @@ type Data struct {
 	BattlePassMissionDataMap map[int]*excels.BattlePassMissionData
 	SceneTagDataMap          map[int]*scene.TagData
 	OpenStateList            []*excels.OpenStateData
+	ItemDataMap              map[int]*excels.ItemData
 }
