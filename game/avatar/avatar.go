@@ -1,19 +1,20 @@
 package avatar
 
 import (
+	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/generated/pb"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Avatar struct {
-	// Equips map[int]GameItem
+	// Equips map[int]inventory.GameItem
 	FightProperties    map[int]float32
 	FightPropOverrides map[int]float32
 	Id                 primitive.ObjectID `bson:"_id"`
 	OwnerId            int                `bson:"ownerId"`
 	// owner player.Player
-	// avatarData AvatarData
-	// skillDepot
+	AvatarData          *avatar.Data
+	SkillDepot          *avatar.SkillDepotData
 	Guid                int64
 	AvatarId            int     `bson:"avatarId"`
 	Level               int     `bson:"level"`

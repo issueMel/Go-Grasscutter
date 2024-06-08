@@ -1,6 +1,7 @@
 package player
 
 import (
+	"Go-Grasscutter/data"
 	"Go-Grasscutter/db"
 	"Go-Grasscutter/game/achievement"
 	"Go-Grasscutter/game/avatar"
@@ -132,8 +133,8 @@ type Player struct {
 	CityInfoData         *city.CityInfoData          `bson:"cityInfoData"`
 }
 
-func NewPlayer(session *kcp.UDPSession) {
-
+func NewPlayer() *Player {
+	return &Player{}
 }
 
 // Create
@@ -162,10 +163,6 @@ func (p *Player) LoadFromDatabase() {
 		p.Codex = &PlayerCodex{}
 	}
 
-	if p.PlayerProfile == nil {
-		p.PlayerProfile = &friends.PlayerProfile{}
-	}
-
 	if p.PlayerProfile == nil || p.PlayerProfile.Uid == 0 {
 		// syncWithCharacter
 		p.PlayerProfile = &friends.PlayerProfile{
@@ -188,7 +185,12 @@ func (p *Player) LoadFromDatabase() {
 		func() {
 			p.Achievements = achievement.GetByPlayerUid(p.ID)
 		},
-		// p.Avatars.LoadFromDatabase,
+		p.Avatars.LoadFromDatabase,
+		p.Inventory.LoadFromDatabase,
+		// getFriendsList
+		// getMailHandler
+		// getQuestManager
+		// loadBattlePassManager
 	)
 
 	// Wait for all tasks to finish.
@@ -196,8 +198,9 @@ func (p *Player) LoadFromDatabase() {
 }
 
 func (p *Player) OnLogin() {
+	// Ensure the player has valid scene tags, allows old accounts to work
 	if p.SceneTags == nil || len(p.SceneTags) == 0 {
-		// todo INCOMPLETE: applyStartingSceneTags()
+		// p.applyStartingSceneTags()
 	}
 
 	// todo GameHome
@@ -212,8 +215,32 @@ func (p *Player) OnLogin() {
 
 }
 
+// TODO ENHANCE: improve applyStartingSceneTags performance
+// Use DB addToSet ?
+func (p *Player) applyStartingSceneTags() {
+	for _, sceneTag := range data.GameData.SceneTagDataMap {
+		if sceneTag.IsDefaultValid {
+			set := make(map[int]struct{})
+			if _, ok := p.SceneTags[sceneTag.SceneId]; ok {
+				for _, v := range p.SceneTags[sceneTag.SceneId] {
+					set[v] = struct{}{}
+				}
+			}
+
+			set[sceneTag.Id] = struct{}{}
+
+			ints := make([]int, len(set))
+			for i := range set {
+				ints = append(ints, i)
+			}
+
+			p.SceneTags[sceneTag.SceneId] = ints
+		}
+	}
+}
+
 func GetPlayerByAccount(account *Account) *Player {
-	p := &Player{}
+	p := NewPlayer()
 	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"accountId", account.ID}}).Decode(p)
 	if err != nil {
 		if errors.Is(mongo.ErrNoDocuments, err) {

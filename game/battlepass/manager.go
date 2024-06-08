@@ -1,21 +1,42 @@
 package battlepass
 
 import (
+	"Go-Grasscutter/db"
 	"Go-Grasscutter/generated/pb"
+	"Go-Grasscutter/log"
+	"context"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"time"
 )
 
+const collName = "battlepass"
+
 type Manager struct {
 	Id           primitive.ObjectID `bson:"id"`
-	OwnerUid     int                `bson:"ownerUid"`
+	OwnerUid     int                `bson:"ownerUid"` // index
 	Point        int                `bson:"point"`
 	CyclePoints  int                `bson:"cyclePoints"`
 	Level        int                `bson:"level"`
 	Viewed       bool               `bson:"viewed"`
 	Paid         bool               `bson:"paid"`
 	Missions     map[int]*Mission   `bson:"missions"`
-	TakenRewards map[int]*Reward    `bson:"takenRewards"`
+	TakenRewards map[int]*Reward    `bson:"takenRewards"` // todo CHECK: need ?
+}
+
+func LoadBattlePass(uid int) *Manager {
+	m := &Manager{}
+	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"ownerUid", uid}}).Decode(m)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil
+		}
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+	return m
 }
 
 func (m *Manager) GetScheduleProto() *pb.BattlePassSchedule {
