@@ -25,6 +25,7 @@ func GetByPlayerUid(uid int) *Achievements {
 	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"uid", uid}}).Decode(a)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
+			// todo ENHANCE: creat
 			return nil
 		}
 		log.SugaredLogger.Error(err)
