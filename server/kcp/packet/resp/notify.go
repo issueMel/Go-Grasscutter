@@ -117,7 +117,7 @@ func PacketAvatarDataNotify(player *player.Player) *base.Packet {
 		log.SugaredLogger.Error(err)
 		return nil
 	}
-	err = copier.Copy(msg.OwnedCostumeList, player.CostumeList)
+	err = copier.Copy(&msg.OwnedCostumeList, player.CostumeList)
 	if err != nil {
 		log.SugaredLogger.Error(err)
 		return nil

@@ -39,28 +39,35 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 	p := sess.Player
 
 	// Show opening cutscene if player has no avatars
+	// todo load p.Avatars.Avatars
 	if len(p.Avatars.Avatars) == 0 {
 		// Pick character
 		sess.State = session.PickingCharacter
 		sess.Send(base.NewPacketWithCode(base.DoSetPlayerBornDataNotify))
 	} else {
 		// todo INCOMPLETE: onLogin()
+		// Login done
 		p.OnLogin()
 		NotifyLogin(sess)
+		NotifyManger(sess)
 	}
 
 	// Final packet to tell client logging in is done
 	sess.Send(resp.PacketPlayerLoginRsp())
 }
 
-func NotifyLogin(sess *session.Session) {
+func NotifyManger(sess *session.Session) {
 	// todo INCOMPLETE: other manager send packet
+	sess.Send(resp.PacketOpenStateUpdateNotify(sess.Player))    // this.getProgressManager().onPlayerLogin();
+	sess.Send(resp.PacketAchievementAllDataNotify(sess.Player)) // Achievements
+
+}
+
+func NotifyLogin(sess *session.Session) {
 	sess.Send(resp.PacketPlayerDataNotify(sess.Player))
 	sess.Send(resp.PacketStoreWeightLimitNotify())
 	sess.Send(resp.PacketPlayerStoreNotify(sess.Player))
 	sess.Send(resp.PacketAvatarDataNotify(sess.Player))
-
-	//sess.Send() // this.getProgressManager().onPlayerLogin();
 
 	sess.Send(resp.PacketFinishedParentQuestNotify(sess.Player))
 	sess.Send(resp.PacketBattlePassAllDataNotify(sess.Player))
@@ -68,9 +75,6 @@ func NotifyLogin(sess *session.Session) {
 	sess.Send(resp.PacketQuestGlobalVarNotify(sess.Player))
 	sess.Send(resp.PacketCodexDataFullNotify(sess.Player))
 	sess.Send(resp.PacketAllWidgetDataNotify(sess.Player))
-
-	// Achievements
-	//sess.Send()
 
 	sess.Send(resp.PacketWidgetGadgetAllDataNotify())
 	sess.Send(resp.PacketCombineDataNotify(sess.Player.UnlockedCombines))
