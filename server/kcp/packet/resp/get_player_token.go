@@ -45,7 +45,7 @@ func PacketGetPlayerTokenBannedRsp(sess *session.Session, retcode int, msg strin
 	code := base.GetPlayerTokenRsp
 	p := pb.GetPlayerTokenRsp{
 		Uid:                uint32(sess.Player.ID),
-		IsProficientPlayer: true, // todo INCOMPLETE
+		IsProficientPlayer: len(sess.Player.Avatars.Avatars) > 0, // todo CHECK
 		Retcode:            int32(retcode),
 		Msg:                msg,
 		BlackUidEndTime:    uint32(blackEndTime),

@@ -6,7 +6,6 @@ import (
 	"Go-Grasscutter/log"
 	"context"
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -28,7 +27,7 @@ func (s *Storage) LoadFromDatabase() {
 	if avatars == nil {
 		return
 	}
-	fmt.Printf("%+v\n", avatars)
+
 	for _, avatar := range avatars {
 		if avatar.Id.IsZero() {
 			// todo CHECK: right?
