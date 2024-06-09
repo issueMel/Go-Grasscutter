@@ -52,7 +52,7 @@ func LoadAvatarData() map[int]*Data {
 		log.SugaredLogger.Panic(err)
 		return nil
 	}
-	// TODO check this
+
 	err = json.Unmarshal(file, &data)
 	if err != nil {
 		log.SugaredLogger.Panic(err)

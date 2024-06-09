@@ -3,6 +3,7 @@ package data
 import (
 	"Go-Grasscutter/data/excels"
 	"Go-Grasscutter/data/excels/avatar"
+	"Go-Grasscutter/data/excels/quest"
 	"Go-Grasscutter/data/excels/scene"
 )
 
@@ -13,6 +14,7 @@ var GameData *Data = &Data{
 	SceneTagDataMap:          scene.LoadSceneTagData(),
 	OpenStateList:            excels.LoadOpenState(),
 	ItemDataMap:              excels.LoadItemData(),
+	QuestDataMap:             quest.LoadQuestData(),
 }
 
 type Data struct {
@@ -22,4 +24,5 @@ type Data struct {
 	SceneTagDataMap          map[int]*scene.TagData
 	OpenStateList            []*excels.OpenStateData
 	ItemDataMap              map[int]*excels.ItemData
+	QuestDataMap             map[int]*quest.Data
 }

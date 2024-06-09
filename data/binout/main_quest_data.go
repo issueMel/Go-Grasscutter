@@ -1,6 +1,6 @@
 package binout
 
 type TalkData struct {
-	Id       int
-	HeroTalk string
+	Id       int    `bson:"id"`
+	HeroTalk string `bson:"heroTalk"`
 }
