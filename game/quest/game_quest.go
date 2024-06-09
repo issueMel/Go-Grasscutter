@@ -1,6 +1,7 @@
 package quest
 
 import (
+	"Go-Grasscutter/data/excels/quest"
 	"Go-Grasscutter/game/quest/enum"
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
@@ -9,10 +10,10 @@ import (
 
 type GameQuest struct {
 	// GameMainQuest
-	// QuestData
+	QuestData          *quest.Data
 	SubQuestId         int    `bson:"subQuestId"`
 	MainQuestId        int    `bson:"mainQuestId"`
-	State              string `bson:"state"` // todo INCOMPLETE: QuestState
+	State              string `bson:"state"` // enum.QuestState
 	StartTime          int    `bson:"startTime"`
 	AcceptTime         int    `bson:"acceptTime"`
 	FinishTime         int    `bson:"finishTime"`

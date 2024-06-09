@@ -189,8 +189,8 @@ func (p *Player) LoadFromDatabase() {
 		p.Inventory.LoadFromDatabase,
 		// getFriendsList
 		// getMailHandler
-		// getQuestManager
-		// loadBattlePassManager
+		p.QuestManager.LoadFromDatabase,
+		// loadBattlePassManager todo
 	)
 
 	// Wait for all tasks to finish.
@@ -271,6 +271,7 @@ func (p *Player) ManagementInit() {
 	}
 
 	p.QuestManager = &quest.Manager{
+		Uid:                 p.ID,
 		MainQuests:          make(map[int]*quest.GameMainQuest),
 		AcceptProgressLists: make(map[int][]int),
 		LoggedQuests:        make([]int, 0),

@@ -13,6 +13,9 @@ func (inventory *Inventory) LoadFromDatabase() {
 	if inventory.loaded {
 		return
 	}
+
+	// todo Wait for avatars to load.
+
 	items := GetInventoryItems(inventory.Uid)
 	if items == nil {
 		return

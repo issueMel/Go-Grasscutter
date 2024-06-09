@@ -8,19 +8,20 @@ import (
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"sync/atomic"
 )
 
 const collName = "avatars"
 
 type Storage struct {
-	Uid         int // Get from player
-	Loaded      bool
+	Uid         int         // Get from player
+	Loaded      atomic.Bool // Inventory need atomic
 	Avatars     map[int]*Avatar
 	AvatarsGuid map[int64]*Avatar
 }
 
 func (s *Storage) LoadFromDatabase() {
-	if s.Loaded {
+	if s.Loaded.Load() {
 		return
 	}
 	avatars := getAvatars(s.Uid)
@@ -57,7 +58,7 @@ func (s *Storage) LoadFromDatabase() {
 			// avatar.save();
 		}
 	}
-	s.Loaded = true
+	s.Loaded.Store(true)
 }
 
 func getAvatars(uid int) []*Avatar {
