@@ -190,7 +190,7 @@ func (p *Player) LoadFromDatabase() {
 		// getFriendsList
 		// getMailHandler
 		p.QuestManager.LoadFromDatabase,
-		// loadBattlePassManager todo
+		p.BattlePassManager.LoadFromDatabase,
 	)
 
 	// Wait for all tasks to finish.

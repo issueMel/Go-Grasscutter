@@ -26,17 +26,15 @@ type Manager struct {
 	TakenRewards map[int]*Reward    `bson:"takenRewards"` // todo CHECK: need ?
 }
 
-func LoadBattlePass(uid int) *Manager {
-	m := &Manager{}
-	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"ownerUid", uid}}).Decode(m)
+func (m *Manager) LoadFromDatabase() {
+	err := db.DB.Collection(collName).FindOne(context.Background(), bson.D{{"ownerUid", m.OwnerUid}}).Decode(m)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil
+			return
 		}
 		log.SugaredLogger.Error(err)
-		return nil
+		return
 	}
-	return m
 }
 
 func (m *Manager) GetScheduleProto() *pb.BattlePassSchedule {
