@@ -123,6 +123,8 @@ type Player struct {
 	NextSendPlayerLocTime int64
 	// EnterHomeRequests map[int]any
 
+	ClientAbility []*pb.AbilityInvokeEntry
+
 	SpringLastUsed       int64                       `bson:"springLastUsed"`
 	MapMarks             map[string]*mapmark.MapMark `bson:"mapMarks"`
 	NextResinRefresh     int                         `bson:"nextResinRefresh"`
@@ -132,7 +134,7 @@ type Player struct {
 	PlayerProgress       *PlayerProgress             `bson:"playerProgress"`
 	ActiveQuestTimers    []int                       `bson:"activeQuestTimers"`
 	MainCharacterElement string                      `bson:"mainCharacterElement"`
-	CityInfoData         *city.CityInfoData          `bson:"cityInfoData"`
+	CityInfoData         map[int]*city.CityInfoData  `bson:"cityInfoData"`
 }
 
 func NewPlayer() *Player {
