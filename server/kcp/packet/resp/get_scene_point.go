@@ -6,6 +6,7 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
+	"github.com/jinzhu/copier"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -17,13 +18,23 @@ func PacketGetScenePointRsp(p *player.Player, sceneId uint32) *base.Packet {
 		UnlockAreaList:    make([]uint32, 0),
 	}
 
-	if len(data.GameData.ScenePointIdList) == 0 {
+	if len(data.GameData.ScenePointIdList) == 0 { // todo CHECK: why need this
 		for i := 0; i < 1000; i++ {
 			msg.UnlockedPointList = append(msg.UnlockedPointList, uint32(i))
 			msg.UnhidePointList = append(msg.UnhidePointList, uint32(i))
 		}
 	} else {
-		// todo data.GameData.ScenePointIdList > 0
+		if val, ok := p.UnlockedScenePoints[int(sceneId)]; ok {
+			err := copier.Copy(&msg.UnlockedPointList, val)
+			if err != nil {
+				log.SugaredLogger.Error(err)
+			}
+
+			err = copier.Copy(&msg.UnhidePointList, val)
+			if err != nil {
+				log.SugaredLogger.Error(err)
+			}
+		}
 	}
 
 	for i := 1; i < 9; i++ {
