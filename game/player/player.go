@@ -17,10 +17,12 @@ import (
 	"Go-Grasscutter/game/quest"
 	"Go-Grasscutter/game/shop"
 	"Go-Grasscutter/game/world"
+	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/utils"
 	"context"
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -329,4 +331,32 @@ func (p *Player) Save() {
 		log.SugaredLogger.Error(err)
 		return
 	}
+}
+
+func (p *Player) GetSocialDetail() *pb.SocialDetail {
+	prot := &pb.SocialDetail{
+		Uid: uint32(p.ID),
+		ProfilePicture: &pb.ProfilePicture{
+			AvatarId: uint32(p.HeadImage),
+		},
+		Nickname:              p.Nickname,
+		Signature:             p.Signature,
+		Level:                 uint32(p.Properties[10013]), // todo getLevel()
+		Birthday:              p.Birthday.GetFilledProtoWhenNotEmpty(),
+		WorldLevel:            uint32(p.Properties[10019]), // todo getWorldLevel()
+		NameCardId:            uint32(p.NameCardID),
+		IsShowAvatar:          p.ShowAvatars,
+		ShowAvatarInfoList:    make([]*pb.SocialShowAvatarInfo, 0), // todo getSocialDetail()
+		ShowNameCardIdList:    make([]uint32, 0),
+		FinishAchievementNum:  uint32(p.Achievements.FinishedAchievementNum),
+		FriendEnterHomeOption: 0, // todo game home
+	}
+
+	err := copier.Copy(&p.ShowNameCardList, p.ShowNameCardList)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return prot
 }
