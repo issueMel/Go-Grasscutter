@@ -15,6 +15,7 @@ var GameData *Data = &Data{
 	OpenStateList:            excels.LoadOpenState(),
 	ItemDataMap:              excels.LoadItemData(),
 	QuestDataMap:             quest.LoadQuestData(),
+	ScenePointIdList:         make([]int, 0), // todo load from BinOutput/Scene/Point
 }
 
 type Data struct {
@@ -25,4 +26,5 @@ type Data struct {
 	OpenStateList            []*excels.OpenStateData
 	ItemDataMap              map[int]*excels.ItemData
 	QuestDataMap             map[int]*quest.Data
+	ScenePointIdList         []int
 }
