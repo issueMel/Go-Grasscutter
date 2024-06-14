@@ -13,15 +13,15 @@ var (
 func Address(ctx *app.RequestContext) string {
 	// Check headers.
 	address := ctx.GetHeader("CF-Connecting-IP")
-	if address != nil || len(address) == 0 {
+	if len(address) != 0 {
 		return string(address)
 	}
 	address = ctx.GetHeader("X-Forwarded-For")
-	if address != nil || len(address) == 0 {
+	if len(address) != 0 {
 		return string(address)
 	}
 	address = ctx.GetHeader("X-Real-IP")
-	if address != nil || len(address) == 0 {
+	if len(address) != 0 {
 		return string(address)
 	}
 	// Return the request IP.

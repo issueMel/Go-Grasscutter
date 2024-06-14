@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	regions              sync.Map // map[string]RegionData
+	regions              = make(map[string]*RegionData)
 	regionListResponse   string
 	regionListResponseCN string
 	doOnce               sync.Once
@@ -100,10 +100,10 @@ func Initialize() {
 			log.SugaredLogger.Error("updatedQuery Marshal error")
 			return
 		}
-		regions.Store(region.Name, &RegionData{
+		regions[region.Name] = &RegionData{
 			RegionQuery: updatedQuery,
 			Base64:      utils.Base64Encode(data),
-		})
+		}
 	}
 
 	// Determine config settings.
@@ -204,20 +204,16 @@ func queryRegionList(c context.Context, ctx *app.RequestContext) {
 			ctx.String(200, regionListResponseCN)
 		case "OSRELiOS", "OSRELWin", "OSRELAnd":
 			// Use the OS region list.
-
-			// Respond with the event result.
 			ctx.String(200, regionListResponse)
 		default:
 			ctx.String(200, regionListResponse)
 		}
 	} else {
 		// Use the default region list.
-
-		// Respond with the event result.
 		ctx.String(200, regionListResponse)
 	}
 	// Log the request to the console.
-
+	// log.SugaredLogger.Infof("[Dispatch] Client %s request: query_region_list", utils.Address(ctx))
 }
 
 func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
@@ -228,9 +224,9 @@ func queryCurrentRegion(c context.Context, ctx *app.RequestContext) {
 	// Get region data.
 	regionData := "CAESGE5vdCBGb3VuZCB2ZXJzaW9uIGNvbmZpZw=="
 	if ctx.QueryArgs().Len() > 0 {
-		val, ok := regions.Load(regionName)
+		val, ok := regions[regionName]
 		if ok {
-			regionData = val.(*RegionData).Base64
+			regionData = val.Base64
 		}
 	}
 

@@ -26,7 +26,10 @@ func (s *Session) Connected() {
 	// remove session when error
 	defer Management.Delete(conn)
 	// todo ENHANCE: kick after save()
-	// defer game.Server.KickPlayer(s.Player.ID)
+	//defer func() {
+	//	game.Server.KickPlayer(s.Player.ID)
+	//	runtime.GC() // todo limit gc times at per second
+	//}()
 	for {
 		n, e := conn.Read(buffer)
 		if e != nil {
@@ -93,7 +96,7 @@ func (s *Session) handleReceive(buffer []byte) {
 			break
 		}
 		if const2 != -30293 {
-			log.SugaredLogger.Error("Bad Data Package Received: got %d ,expect -30293", const2)
+			log.SugaredLogger.Errorf("Bad Data Package Received: got %d ,expect -30293", const2)
 			break // Bad packet
 		}
 		// Handle

@@ -15,7 +15,7 @@ func InitLogger() {
 	consoleCore := zapcore.NewCore(encoder, getConsoleWriter(), getLevel())
 	core := zapcore.NewTee(fileCore, consoleCore)
 	// dev zap.New(core, zap.AddCaller())
-	logger := zap.New(core)
+	logger := zap.New(core, zap.AddCaller())
 	SugaredLogger = logger.Sugar()
 }
 
