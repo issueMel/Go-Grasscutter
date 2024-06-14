@@ -3,6 +3,8 @@ package avatar
 import (
 	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/generated/pb"
+	"Go-Grasscutter/log"
+	"github.com/jinzhu/copier"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -49,5 +51,72 @@ type Avatar struct {
 
 func (a *Avatar) ToProto() *pb.AvatarInfo {
 	// todo INCOMPLETE: ToProto()
-	return &pb.AvatarInfo{}
+	avatarFetter := pb.AvatarFetterInfo{
+		ExpLevel:                uint32(a.FetterLevel),
+		FetterList:              make([]*pb.FetterData, len(a.Fetters)),
+		RewardedFetterLevelList: make([]uint32, 0),
+	}
+	if a.FetterLevel != 10 {
+		avatarFetter.ExpNumber = uint32(a.FetterExp)
+	}
+
+	if len(a.Fetters) > 0 {
+		for i := range a.Fetters {
+			avatarFetter.FetterList[i] = &pb.FetterData{
+				FetterId:    uint32(a.Fetters[i]),
+				FetterState: 3, // todo enum FetterState
+			}
+		}
+	}
+
+	// todo NameCardList
+	// todo RewardedFetterLevelList
+	proto := &pb.AvatarInfo{
+		AvatarId:                uint32(a.AvatarId),
+		Guid:                    uint64(a.Guid),
+		LifeState:               1,
+		TalentIdList:            make([]uint32, 0),
+		FightPropMap:            make(map[uint32]float32),
+		SkillDepotId:            uint32(a.SkillDepotId),
+		CoreProudSkillLevel:     6, // todo getCoreProudSkillLevel()
+		SkillLevelMap:           make(map[uint32]uint32),
+		InherentProudSkillList:  make([]uint32, 0),
+		ProudSkillExtraLevelMap: make(map[uint32]uint32),
+		AvatarType:              uint32(a.AvatarType),
+		BornTime:                uint32(a.BornTime),
+		FetterInfo:              &avatarFetter,
+		WearingFlycloakId:       uint32(a.FlyCloak),
+		CostumeId:               uint32(a.Costume),
+	}
+
+	err := copier.Copy(&proto.TalentIdList, a.TalentIdList)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	err = copier.Copy(&proto.FightPropMap, a.FightProperties)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	err = copier.Copy(&proto.SkillLevelMap, a.SkillLevelMap)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	err = copier.Copy(&proto.InherentProudSkillList, a.ProudSkillList)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	err = copier.Copy(&proto.ProudSkillExtraLevelMap, a.ProudSkillBonusMap)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+	return proto
 }
