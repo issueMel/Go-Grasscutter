@@ -5,7 +5,7 @@ import "Go-Grasscutter/game/entity"
 type World struct {
 	// players []player.Player
 
-	// entity           *EntityWorld
+	Entity           *EntityWorld
 	NextEntityId     int
 	NextPeerId       int
 	WorldLevel       int
@@ -18,6 +18,5 @@ type World struct {
 }
 
 type EntityWorld struct {
-	World *World
 	entity.GameEntity
 }

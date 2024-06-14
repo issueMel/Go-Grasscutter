@@ -14,6 +14,7 @@ import (
 	"Go-Grasscutter/game/managers/cooking"
 	"Go-Grasscutter/game/managers/forging"
 	"Go-Grasscutter/game/managers/mapmark"
+	"Go-Grasscutter/game/pros"
 	"Go-Grasscutter/game/quest"
 	"Go-Grasscutter/game/shop"
 	"Go-Grasscutter/game/world"
@@ -51,7 +52,7 @@ type Player struct {
 	ShowAvatars      bool            `bson:"showAvatars"`
 	ShowAvatarList   []int           `bson:"showAvatarList"`
 	ShowNameCardList []int           `bson:"showNameCardList"`
-	Properties       map[int]int     `bson:"properties"`
+	Properties       map[int]int     `bson:"properties"` // int, pros.PlayerProperty
 	CurrentRealmID   int             `bson:"currentRealmId"`
 	IsInEditMode     bool
 	WidgetID         int  `bson:"widgetId"`
@@ -287,7 +288,7 @@ func (p *Player) ManagementInit() {
 		TakenRewards: make(map[int]*battlepass.Reward),
 	}
 
-	p.World = &world.World{} // todo INCOMPLETE
+	p.InitWorld()
 }
 
 func CheckIfExists(uid int) bool {
@@ -336,6 +337,25 @@ func (p *Player) Save() {
 }
 
 func (p *Player) GetSocialDetail() *pb.SocialDetail {
+	infoList := make([]*pb.SocialShowAvatarInfo, 0)
+	if p.isOnline() {
+		if len(p.ShowAvatarList) > 0 {
+			infoList = make([]*pb.SocialShowAvatarInfo, 0, len(p.ShowAvatarList))
+			for _, avatarId := range p.ShowAvatarList {
+				avatar, ok := p.Avatars.Avatars[avatarId]
+				if ok {
+					infoList = append(infoList, &pb.SocialShowAvatarInfo{
+						AvatarId:  uint32(avatarId),
+						Level:     uint32(avatar.Level),
+						CostumeId: uint32(avatar.Costume),
+					})
+				}
+
+			}
+		}
+	} else {
+		// todo !player.isOnline()
+	}
 	prot := &pb.SocialDetail{
 		Uid: uint32(p.ID),
 		ProfilePicture: &pb.ProfilePicture{
@@ -343,12 +363,12 @@ func (p *Player) GetSocialDetail() *pb.SocialDetail {
 		},
 		Nickname:              p.Nickname,
 		Signature:             p.Signature,
-		Level:                 uint32(p.Properties[10013]), // todo getLevel()
+		Level:                 uint32(p.GetLevel()),
 		Birthday:              p.Birthday.GetFilledProtoWhenNotEmpty(),
-		WorldLevel:            uint32(p.Properties[10019]), // todo getWorldLevel()
+		WorldLevel:            uint32(p.GetWorldLevel()),
 		NameCardId:            uint32(p.NameCardID),
 		IsShowAvatar:          p.ShowAvatars,
-		ShowAvatarInfoList:    make([]*pb.SocialShowAvatarInfo, 0), // todo getSocialDetail()
+		ShowAvatarInfoList:    infoList,
 		ShowNameCardIdList:    make([]uint32, 0),
 		FinishAchievementNum:  uint32(p.Achievements.FinishedAchievementNum),
 		FriendEnterHomeOption: 0, // todo game home
@@ -361,4 +381,20 @@ func (p *Player) GetSocialDetail() *pb.SocialDetail {
 	}
 
 	return prot
+}
+
+func (p *Player) GetProperty(id int) int {
+	if p.Properties != nil {
+		return p.Properties[id]
+	}
+	return 0
+}
+
+func (p *Player) GetLevel() int {
+	return p.GetProperty(pros.PROP_PLAYER_LEVEL)
+}
+
+func (p *Player) isOnline() bool {
+	// todo session.isActive()
+	return p.Session != nil
 }
