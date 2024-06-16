@@ -1,9 +1,11 @@
 package world
 
-import "Go-Grasscutter/game/entity"
+import (
+	"Go-Grasscutter/game/entity"
+)
 
 type World struct {
-	// players []player.Player
+	// players []atomic.Pointer[any]
 
 	Entity           *EntityWorld
 	NextEntityId     int
@@ -18,5 +20,5 @@ type World struct {
 }
 
 type EntityWorld struct {
-	entity.GameEntity
+	*entity.GameEntity
 }
