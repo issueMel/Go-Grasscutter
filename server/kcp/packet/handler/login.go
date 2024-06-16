@@ -3,7 +3,6 @@ package handler
 import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
-	"Go-Grasscutter/server/kcp/game"
 	"Go-Grasscutter/server/kcp/packet/base"
 	"Go-Grasscutter/server/kcp/packet/resp"
 	"Go-Grasscutter/server/kcp/session"
@@ -39,7 +38,6 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 	p := sess.Player
 
 	// Show opening cutscene if player has no avatars
-	// todo load p.Avatars.Avatars
 	if len(p.Avatars.Avatars) == 0 {
 		// Pick character
 		sess.State = session.PickingCharacter
@@ -58,9 +56,13 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 
 func NotifyManger(sess *session.Session) {
 	// todo INCOMPLETE: other manager send packet
-	sess.Send(resp.PacketOpenStateUpdateNotify(sess.Player))    // this.getProgressManager().onPlayerLogin();
-	sess.Send(resp.PacketAchievementAllDataNotify(sess.Player)) // Achievements
+	sess.Send(resp.PacketOpenStateUpdateNotify(sess.Player))         // this.getProgressManager().onPlayerLogin();
+	sess.Send(resp.PacketAchievementAllDataNotify(sess.Player))      // Achievements
+	sess.Send(resp.PacketBattlePassMissionUpdateNotify(sess.Player)) // triggerMission
 
+	// onOwnerLogin
+
+	sess.Send(resp.PacketActivityScheduleInfoNotify()) // ActivityManager
 }
 
 func NotifyLogin(sess *session.Session) {
@@ -83,6 +85,11 @@ func NotifyLogin(sess *session.Session) {
 	sess.Send(resp.PacketPlayerEnterSceneNotify(sess.Player))
 	sess.Send(resp.PacketPlayerLevelRewardUpdateNotify(sess.Player.RewardedLevels))
 
+	// First notify packets sent
+	sess.Player.HasSentLoginPackets = true
+
 	sess.State = session.Active
-	game.Server.RegisterPlayer(sess.Player)
+
+	// game.Server.RegisterPlayer(sess.Player)
+	// todo KickPlayer
 }

@@ -270,8 +270,19 @@ func PacketCodexDataFullNotify(player *player.Player) *base.Packet {
 	code := base.CodexDataFullNotify
 
 	msg := pb.CodexDataFullNotify{
-		TypeDataList: make([]*pb.CodexTypeData, 0), // todo CodexTypeData x 8
+		TypeDataList: make([]*pb.CodexTypeData, 8),
 	}
+
+	for i := 1; i < 9; i++ {
+		msg.TypeDataList[i-1] = &pb.CodexTypeData{
+			WeaponMaxPromoteLevelMap: make(map[uint32]uint32),
+			HaveViewedList:           make([]bool, 0),
+			CodexIdList:              make([]uint32, 0),
+			Type:                     pb.CodexType(i),
+		}
+	}
+
+	// todo CodexTypeData x 8
 
 	data, err := proto.Marshal(&msg)
 	if err != nil {
@@ -291,11 +302,10 @@ func PacketAllWidgetDataNotify(player *player.Player) *base.Packet {
 	msg := pb.AllWidgetDataNotify{
 		LunchBoxData:                      &pb.LunchBoxData{},
 		OneoffGatherPointDetectorDataList: make([]*pb.OneoffGatherPointDetectorData, 0),
-		// AllOneoffGatherPointDetectorDataList
-		PEOHMDJKMKO:             make([]*pb.WidgetCoolDownData, 0),
-		AnchorPointList:         make([]*pb.AnchorPointData, 0),
-		ClientCollectorDataList: make([]*pb.ClientCollectorData, 0),
-		// AllNormalCoolDownDataList
+		PEOHMDJKMKO:                       make([]*pb.WidgetCoolDownData, 0),
+		AnchorPointList:                   make([]*pb.AnchorPointData, 0),
+		ClientCollectorDataList:           make([]*pb.ClientCollectorData, 0),
+		// NormalCoolDownDataList
 		MCMDFPAFOIG: make([]*pb.WidgetCoolDownData, 0),
 		SlotList:    make([]*pb.WidgetSlotData, 0),
 	}
@@ -397,13 +407,13 @@ func PacketPlayerEnterSceneNotify(p *player.Player) *base.Packet {
 	p.EnterSceneToken = rand.Intn(99999-1000) + 1000
 
 	msg := pb.PlayerEnterSceneNotify{
-		SceneId:         uint32(p.SceneID),
-		Pos:             p.Position.ToProto(),
-		SceneBeginTime:  uint64(time.Now().Unix()),
-		Type:            pb.EnterType_ENTER_TYPE_SELF,
-		TargetUid:       uint32(p.ID),
-		EnterSceneToken: uint32(p.EnterSceneToken),
-		// todo WorldLevel: p.Properties.
+		SceneId:                uint32(p.SceneID),
+		Pos:                    p.Position.ToProto(),
+		SceneBeginTime:         uint64(time.Now().Unix()),
+		Type:                   pb.EnterType_ENTER_TYPE_SELF,
+		TargetUid:              uint32(p.ID),
+		EnterSceneToken:        uint32(p.EnterSceneToken),
+		WorldLevel:             uint32(p.GetWorldLevel()),
 		EnterReason:            uint32(pros.Login),
 		IsFirstLoginEnterScene: !p.HasSentLoginPackets,
 		WorldType:              1,
@@ -420,10 +430,6 @@ func PacketPlayerEnterSceneNotify(p *player.Player) *base.Packet {
 		log.SugaredLogger.Error(err)
 		return nil
 	}
-
-	// todo move p.HasSentLoginPackets to another location
-	// First notify packets sent
-	p.HasSentLoginPackets = true
 
 	return &base.Packet{
 		Opcode: code,

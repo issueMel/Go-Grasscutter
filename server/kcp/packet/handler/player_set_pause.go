@@ -22,7 +22,11 @@ func HandlerPlayerSetPauseReq(sess *session.Session, header, payload []byte) {
 	}
 
 	// Check if the player is in a multiplayer world.
-	// todo INCOMPLETE
-	// sess.Send(resp.PacketPlayerSetPauseRsp(pb.Retcode_RET_FAIL))
-	sess.Send(resp.PacketPlayerSetPauseRsp(pb.Retcode_RET_SUCC))
+
+	if sess.Player.World.IsMultiplayer {
+		sess.Send(resp.PacketPlayerSetPauseRsp(pb.Retcode_RET_FAIL))
+	} else {
+		// todo INCOMPLETE: world
+		sess.Send(resp.PacketPlayerSetPauseRsp(pb.Retcode_RET_SUCC))
+	}
 }
