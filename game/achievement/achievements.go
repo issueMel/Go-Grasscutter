@@ -17,7 +17,7 @@ type Achievements struct {
 	Uid                    int                  `bson:"uid"`
 	AchievementList        map[int]*Achievement `bson:"achievementList"`
 	FinishedAchievementNum int                  `bson:"finishedAchievementNum"`
-	TakenGoalRewardIdList  []int                `bson:"takenGoalRewardIdList"`
+	TakenGoalRewardIdList  []int32              `bson:"takenGoalRewardIdList"`
 }
 
 func GetByPlayerUid(uid int) *Achievements {

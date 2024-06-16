@@ -5,16 +5,18 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
+	"Go-Grasscutter/utils"
 	"google.golang.org/protobuf/proto"
-	"unsafe"
 )
 
 func PacketGetSceneAreaRsp(p *player.Player, sceneId uint32) *base.Packet {
 	code := base.GetSceneAreaRsp
+	ints := p.UnlockedSceneAreas[int(sceneId)]
+
 	msg := pb.GetSceneAreaRsp{
 		CityInfoList: make([]*pb.CityInfo, 0, 5),
 		SceneId:      sceneId,
-		AreaIdList:   *(*[]uint32)(unsafe.Pointer(&p.UnlockedSceneAreas)),
+		AreaIdList:   utils.ToUint32Slice(ints),
 	}
 
 	for i := 1; i < 6; i++ {

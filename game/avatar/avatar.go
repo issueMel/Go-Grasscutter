@@ -3,8 +3,8 @@ package avatar
 import (
 	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/generated/pb"
+	"Go-Grasscutter/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"unsafe"
 )
 
 type Avatar struct {
@@ -30,19 +30,19 @@ type Avatar struct {
 	SkillLevelMap       map[int]int `bson:"skillLevelMap"`
 	SkillExtraChargeMap map[int]int
 	ProudSkillBonusMap  map[int]int
-	SkillDepotId        int   `bson:"skillDepotId"`
-	TalentIdList        []int `bson:"talentIdList"`   // set<int>
-	ProudSkillList      []int `bson:"proudSkillList"` // set<int>
-	FlyCloak            int   `bson:"flyCloak"`
-	Costume             int   `bson:"costume"`
-	BornTime            int   `bson:"bornTime"`
-	FetterLevel         int   `bson:"fetterLevel"`
-	FetterExp           int   `bson:"fetterExp"`
-	NameCardRewardId    int   `bson:"nameCardRewardId"`
-	NameCardId          int   `bson:"nameCardId"`
-	TrialAvatarId       int   `bson:"trialAvatarId"` // trial avatar property
-	GrantReason         int   `bson:"grantReason"`   // cannot store to db if grant reason is not integer
-	FromParentQuestId   int   `bson:"fromParentQuestId"`
+	SkillDepotId        int     `bson:"skillDepotId"`
+	TalentIdList        []int32 `bson:"talentIdList"`   // set<int>
+	ProudSkillList      []int32 `bson:"proudSkillList"` // set<int>
+	FlyCloak            int     `bson:"flyCloak"`
+	Costume             int     `bson:"costume"`
+	BornTime            int     `bson:"bornTime"`
+	FetterLevel         int     `bson:"fetterLevel"`
+	FetterExp           int     `bson:"fetterExp"`
+	NameCardRewardId    int     `bson:"nameCardRewardId"`
+	NameCardId          int     `bson:"nameCardId"`
+	TrialAvatarId       int     `bson:"trialAvatarId"` // trial avatar property
+	GrantReason         int     `bson:"grantReason"`   // cannot store to db if grant reason is not integer
+	FromParentQuestId   int     `bson:"fromParentQuestId"`
 	// so far no outer class or prop value has information of this, but from packet:
 	// 1 = normal, 2 = trial avatar
 	AvatarType int
@@ -74,12 +74,12 @@ func (a *Avatar) ToProto() *pb.AvatarInfo {
 		AvatarId:                uint32(a.AvatarId),
 		Guid:                    uint64(a.Guid),
 		LifeState:               1,
-		TalentIdList:            *(*[]uint32)(unsafe.Pointer(&a.TalentIdList)),
+		TalentIdList:            utils.ToUint32Slice(a.TalentIdList),
 		FightPropMap:            make(map[uint32]float32),
 		SkillDepotId:            uint32(a.SkillDepotId),
 		CoreProudSkillLevel:     6, // todo getCoreProudSkillLevel()
 		SkillLevelMap:           make(map[uint32]uint32),
-		InherentProudSkillList:  *(*[]uint32)(unsafe.Pointer(&a.ProudSkillList)),
+		InherentProudSkillList:  utils.ToUint32Slice(a.ProudSkillList),
 		ProudSkillExtraLevelMap: make(map[uint32]uint32),
 		AvatarType:              uint32(a.AvatarType),
 		BornTime:                uint32(a.BornTime),

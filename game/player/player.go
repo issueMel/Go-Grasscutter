@@ -27,7 +27,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"sync"
-	"unsafe"
 )
 
 const collName = "players"
@@ -51,7 +50,7 @@ type Player struct {
 	Codex            *PlayerCodex    `bson:"codex"`
 	ShowAvatars      bool            `bson:"showAvatars"`
 	ShowAvatarList   []int           `bson:"showAvatarList"`
-	ShowNameCardList []int           `bson:"showNameCardList"`
+	ShowNameCardList []int32         `bson:"showNameCardList"`
 	Properties       map[int]int     `bson:"properties"` // int, pros.PlayerProperty
 	CurrentRealmID   int             `bson:"currentRealmId"`
 	IsInEditMode     bool
@@ -63,16 +62,16 @@ type Player struct {
 	UnlimitedStamina bool `bson:"unlimitedStamina"`
 
 	NameCardList              []int                                   `bson:"nameCardList"`
-	FlyCloakList              []int                                   `bson:"flyCloakList"`
-	CostumeList               []int                                   `bson:"costumeList"`
-	RewardedLevels            []int                                   `bson:"rewardedLevels"`
+	FlyCloakList              []int32                                 `bson:"flyCloakList"`
+	CostumeList               []int32                                 `bson:"costumeList"`
+	RewardedLevels            []int32                                 `bson:"rewardedLevels"`
 	HomeRewardedLevels        []int                                   `bson:"homeRewardedLevels"`
 	RealmList                 []int                                   `bson:"realmList"`
 	seenRealmList             []int                                   `bson:"seenRealmList"`
 	UnlockedForgingBlueprints []int                                   `bson:"unlockedForgingBlueprints"`
-	UnlockedCombines          []int                                   `bson:"unlockedCombines"`
-	UnlockedFurniture         []int                                   `bson:"unlockedFurniture"`
-	UnlockedFurnitureSuite    []int                                   `bson:"unlockedFurnitureSuite"`
+	UnlockedCombines          []int32                                 `bson:"unlockedCombines"`
+	UnlockedFurniture         []int32                                 `bson:"unlockedFurniture"`
+	UnlockedFurnitureSuite    []int32                                 `bson:"unlockedFurnitureSuite"`
 	ExpeditionInfo            map[int64]*expedition.ExpeditionInfo    `bson:"expeditionInfo"`
 	UnlockedRecipies          map[int]int                             `bson:"unlockedRecipies"`
 	ActiveForges              []*forging.ActiveForgeData              `bson:"activeForges"`
@@ -80,9 +79,9 @@ type Player struct {
 	QuestGlobalVariables      map[int]int                             `bson:"questGlobalVariables"`
 	OpenStates                map[int]int                             `bson:"openStates"`
 	SceneTags                 map[int][]int                           `bson:"sceneTags"`
-	UnlockedSceneAreas        map[int][]int                           `bson:"unlockedSceneAreas"`
-	UnlockedScenePoints       map[int][]int                           `bson:"unlockedScenePoints"`
-	ChatEmojiIdList           []int                                   `bson:"chatEmojiIdList"`
+	UnlockedSceneAreas        map[int][]int32                         `bson:"unlockedSceneAreas"`
+	UnlockedScenePoints       map[int][]int32                         `bson:"unlockedScenePoints"`
+	ChatEmojiIdList           []int32                                 `bson:"chatEmojiIdList"`
 
 	NextGuid int64
 	PeerId   int
@@ -369,7 +368,7 @@ func (p *Player) GetSocialDetail() *pb.SocialDetail {
 		NameCardId:            uint32(p.NameCardID),
 		IsShowAvatar:          p.ShowAvatars,
 		ShowAvatarInfoList:    infoList,
-		ShowNameCardIdList:    *(*[]uint32)(unsafe.Pointer(&p.ShowNameCardList)),
+		ShowNameCardIdList:    utils.ToUint32Slice(p.ShowNameCardList),
 		FinishAchievementNum:  uint32(p.Achievements.FinishedAchievementNum),
 		FriendEnterHomeOption: 0, // todo game home
 	}

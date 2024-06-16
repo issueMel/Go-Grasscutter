@@ -6,8 +6,8 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
+	"Go-Grasscutter/utils"
 	"google.golang.org/protobuf/proto"
-	"unsafe"
 )
 
 func PacketGetScenePointRsp(p *player.Player, sceneId uint32) *base.Packet {
@@ -25,8 +25,9 @@ func PacketGetScenePointRsp(p *player.Player, sceneId uint32) *base.Packet {
 		}
 	} else {
 		if val, ok := p.UnlockedScenePoints[int(sceneId)]; ok {
-			msg.UnlockedPointList = *(*[]uint32)(unsafe.Pointer(&val))
-			msg.UnhidePointList = *(*[]uint32)(unsafe.Pointer(&val))
+			nums := utils.ToUint32Slice(val)
+			msg.UnlockedPointList = nums
+			msg.UnhidePointList = nums
 		}
 	}
 

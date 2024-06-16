@@ -8,8 +8,8 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
+	"Go-Grasscutter/utils"
 	"google.golang.org/protobuf/proto"
-	"unsafe"
 )
 
 func PacketOpenStateUpdateNotify(player *player.Player) *base.Packet {
@@ -52,7 +52,7 @@ func PacketAchievementAllDataNotify(player *player.Player) *base.Packet {
 	achievements := player.Achievements
 
 	msg := pb.AchievementAllDataNotify{
-		RewardTakenGoalIdList: *(*[]uint32)(unsafe.Pointer(&achievements.TakenGoalRewardIdList)),
+		RewardTakenGoalIdList: utils.ToUint32Slice(achievements.TakenGoalRewardIdList),
 		AchievementList:       make([]*pb.Achievement, 0),
 	}
 
@@ -155,7 +155,7 @@ func PacketUnlockedFurnitureFormulaDataNotify(p *player.Player) *base.Packet {
 	code := base.UnlockedFurnitureFormulaDataNotify
 	var msg = pb.UnlockedFurnitureFormulaDataNotify{
 		IsAll:           true,
-		FurnitureIdList: *(*[]uint32)(unsafe.Pointer(&p.UnlockedFurniture)),
+		FurnitureIdList: utils.ToUint32Slice(p.UnlockedFurniture),
 	}
 
 	d, err := proto.Marshal(&msg)
@@ -173,7 +173,7 @@ func PacketUnlockedFurnitureFormulaDataNotify(p *player.Player) *base.Packet {
 func PacketUnlockedFurnitureSuiteDataNotify(p *player.Player) *base.Packet {
 	code := base.UnlockedFurnitureSuiteDataNotify
 	msg := pb.UnlockedFurnitureSuiteDataNotify{
-		FurnitureSuiteIdList: *(*[]uint32)(unsafe.Pointer(&p.UnlockedFurnitureSuite)),
+		FurnitureSuiteIdList: utils.ToUint32Slice(p.UnlockedFurnitureSuite),
 		IsAll:                true,
 	}
 

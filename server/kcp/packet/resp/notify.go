@@ -9,11 +9,11 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
+	"Go-Grasscutter/utils"
 	"fmt"
 	"google.golang.org/protobuf/proto"
 	"math/rand"
 	"time"
-	"unsafe"
 )
 
 func PacketPlayerDataNotify(player *player.Player) *base.Packet {
@@ -106,8 +106,8 @@ func PacketAvatarDataNotify(player *player.Player) *base.Packet {
 	msg := pb.AvatarDataNotify{
 		CurAvatarTeamId:           uint32(player.TeamManager.CurrentTeamIndex),
 		ChooseAvatarGuid:          uint64(player.TeamManager.CurrentCharacterIndex),
-		OwnedFlycloakList:         *(*[]uint32)(unsafe.Pointer(&player.FlyCloakList)),
-		OwnedCostumeList:          *(*[]uint32)(unsafe.Pointer(&player.CostumeList)),
+		OwnedFlycloakList:         utils.ToUint32Slice(player.FlyCloakList),
+		OwnedCostumeList:          utils.ToUint32Slice(player.CostumeList),
 		AvatarList:                make([]*pb.AvatarInfo, 0, len(player.Avatars.Avatars)),
 		AvatarTeamMap:             make(map[uint32]*pb.AvatarTeam),
 		BackupAvatarTeamOrderList: make([]uint32, 0),
@@ -341,10 +341,10 @@ func PacketWidgetGadgetAllDataNotify() *base.Packet {
 	}
 }
 
-func PacketCombineDataNotify(unlockedCombines []int) *base.Packet {
+func PacketCombineDataNotify(unlockedCombines []int32) *base.Packet {
 	code := base.CombineDataNotify
 	msg := pb.CombineDataNotify{
-		CombineIdList: *(*[]uint32)(unsafe.Pointer(&unlockedCombines)),
+		CombineIdList: utils.ToUint32Slice(unlockedCombines),
 	}
 
 	data, err := proto.Marshal(&msg)
@@ -359,11 +359,11 @@ func PacketCombineDataNotify(unlockedCombines []int) *base.Packet {
 	}
 }
 
-func PacketGetChatEmojiCollectionRsp(emojiIds []int) *base.Packet {
+func PacketGetChatEmojiCollectionRsp(emojiIds []int32) *base.Packet {
 	code := base.GetChatEmojiCollectionRsp
 	msg := pb.GetChatEmojiCollectionRsp{
 		ChatEmojiCollectionData: &pb.ChatEmojiCollectionData{
-			EmojiIdList: *(*[]uint32)(unsafe.Pointer(&emojiIds)),
+			EmojiIdList: utils.ToUint32Slice(emojiIds),
 		},
 	}
 
@@ -416,10 +416,10 @@ func PacketPlayerEnterSceneNotify(p *player.Player) *base.Packet {
 	}
 }
 
-func PacketPlayerLevelRewardUpdateNotify(rewardedLevels []int) *base.Packet {
+func PacketPlayerLevelRewardUpdateNotify(rewardedLevels []int32) *base.Packet {
 	code := base.PlayerLevelRewardUpdateNotify
 	msg := pb.PlayerLevelRewardUpdateNotify{
-		LevelList: *(*[]uint32)(unsafe.Pointer(&rewardedLevels)),
+		LevelList: utils.ToUint32Slice(rewardedLevels),
 	}
 
 	data, err := proto.Marshal(&msg)

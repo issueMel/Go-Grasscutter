@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"github.com/cloudwego/hertz/pkg/app"
 	"time"
+	"unsafe"
 )
 
 var (
@@ -63,4 +64,16 @@ func AbilityHash(str string) int {
 
 func GetCurrentSeconds() int {
 	return time.Now().Second()
+}
+
+func ByteToString(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
+}
+
+func StringToByte(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
+func ToUint32Slice(ints []int32) []uint32 {
+	return *(*[]uint32)(unsafe.Pointer(&ints))
 }
