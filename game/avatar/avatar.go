@@ -3,7 +3,6 @@ package avatar
 import (
 	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/generated/pb"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"unsafe"
 )
@@ -88,21 +87,24 @@ func (a *Avatar) ToProto() *pb.AvatarInfo {
 		WearingFlycloakId:       uint32(a.FlyCloak),
 		CostumeId:               uint32(a.Costume),
 	}
+
 	if a.FightProperties != nil {
-		fmt.Printf("%+v\n", a.FightProperties)
+		for k, v := range a.FightProperties {
+			proto.SkillLevelMap[uint32(k)] = uint32(v)
+		}
 	}
-	// todo check panic here
-	//if a.FightProperties != nil {
-	//	proto.FightPropMap = *(*map[uint32]float32)(unsafe.Pointer(&a.FightProperties))
-	//}
-	//
-	//if a.SkillLevelMap != nil {
-	//	proto.SkillLevelMap = *(*map[uint32]uint32)(unsafe.Pointer(&a.SkillLevelMap))
-	//}
-	//
-	//if a.ProudSkillBonusMap != nil {
-	//	proto.ProudSkillExtraLevelMap = *(*map[uint32]uint32)(unsafe.Pointer(&a.ProudSkillBonusMap))
-	//}
+
+	if a.SkillLevelMap != nil {
+		for k, v := range a.SkillLevelMap {
+			proto.SkillLevelMap[uint32(k)] = uint32(v)
+		}
+	}
+
+	if a.ProudSkillBonusMap != nil {
+		for k, v := range a.ProudSkillBonusMap {
+			proto.ProudSkillExtraLevelMap[uint32(k)] = uint32(v)
+		}
+	}
 
 	return proto
 }
