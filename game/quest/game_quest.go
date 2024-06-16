@@ -4,8 +4,7 @@ import (
 	"Go-Grasscutter/data/excels/quest"
 	"Go-Grasscutter/game/quest/enum"
 	"Go-Grasscutter/generated/pb"
-	"Go-Grasscutter/log"
-	"github.com/jinzhu/copier"
+	"unsafe"
 )
 
 type GameQuest struct {
@@ -32,18 +31,8 @@ func (g *GameQuest) ToProto() *pb.Quest {
 		StartTime:          uint32(g.StartTime),
 		StartGameTime:      438,
 		AcceptTime:         uint32(g.AcceptTime),
-		FinishProgressList: make([]uint32, 0),
-		FailProgressList:   make([]uint32, 0),
-	}
-	err := copier.Copy(&prot.FinishProgressList, g.FinishProgressList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
-	err = copier.Copy(&prot.FailProgressList, g.FailProgressList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
+		FinishProgressList: *(*[]uint32)(unsafe.Pointer(&g.FinishProgressList)),
+		FailProgressList:   *(*[]uint32)(unsafe.Pointer(&g.FailProgressList)),
 	}
 	return prot
 }

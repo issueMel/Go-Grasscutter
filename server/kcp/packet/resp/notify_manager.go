@@ -4,11 +4,12 @@ import (
 	"Go-Grasscutter/config"
 	"Go-Grasscutter/data"
 	"Go-Grasscutter/game/player"
+	"Go-Grasscutter/game/pros"
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
-	"github.com/jinzhu/copier"
 	"google.golang.org/protobuf/proto"
+	"unsafe"
 )
 
 func PacketOpenStateUpdateNotify(player *player.Player) *base.Packet {
@@ -51,18 +52,129 @@ func PacketAchievementAllDataNotify(player *player.Player) *base.Packet {
 	achievements := player.Achievements
 
 	msg := pb.AchievementAllDataNotify{
-		RewardTakenGoalIdList: make([]uint32, 0),
+		RewardTakenGoalIdList: *(*[]uint32)(unsafe.Pointer(&achievements.TakenGoalRewardIdList)),
 		AchievementList:       make([]*pb.Achievement, 0),
 	}
 
-	err := copier.Copy(&msg.RewardTakenGoalIdList, achievements.TakenGoalRewardIdList)
+	for _, val := range achievements.AchievementList {
+		msg.AchievementList = append(msg.AchievementList, val.ToProto())
+	}
+
+	d, err := proto.Marshal(&msg)
 	if err != nil {
 		log.SugaredLogger.Error(err)
 		return nil
 	}
 
-	for _, val := range achievements.AchievementList {
-		msg.AchievementList = append(msg.AchievementList, val.ToProto())
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketForgeDataNotify() *base.Packet {
+	code := base.ForgeDataNotify
+	msg := pb.ForgeDataNotify{
+		ForgeQueueMap: make(map[uint32]*pb.ForgeQueueData),
+		MaxQueueNum:   4,
+		ForgeIdList:   make([]uint32, 0),
+	}
+
+	// todo INCOMPLETE
+
+	d, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketResinChangeNotify(p *player.Player) *base.Packet {
+	code := base.ResinChangeNotify
+	msg := pb.ResinChangeNotify{
+		CurBuyCount:      uint32(p.GetProperty(pros.PROP_PLAYER_RESIN)),
+		NextAddTimestamp: uint32(p.NextResinRefresh),
+		CurValue:         uint32(p.ResinBuyCount),
+	}
+
+	d, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketCookDataNotify() *base.Packet {
+	code := base.CookDataNotify
+	msg := pb.CookDataNotify{
+		RecipeDataList: make([]*pb.CookRecipeData, 0), // todo cookingManager
+	}
+
+	d, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketCompoundDataNotify() *base.Packet {
+	code := base.CompoundDataNotify
+	msg := pb.CompoundDataNotify{
+		CompoundQueueDataList: make([]*pb.CompoundQueueData, 0),
+		UnlockCompoundList:    make([]uint32, 0),
+	}
+
+	d, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketUnlockedFurnitureFormulaDataNotify(p *player.Player) *base.Packet {
+	code := base.UnlockedFurnitureFormulaDataNotify
+	var msg = pb.UnlockedFurnitureFormulaDataNotify{
+		IsAll:           true,
+		FurnitureIdList: *(*[]uint32)(unsafe.Pointer(&p.UnlockedFurniture)),
+	}
+
+	d, err := proto.Marshal(&msg)
+	if err != nil {
+		log.SugaredLogger.Error(err)
+		return nil
+	}
+
+	return &base.Packet{
+		Opcode: code,
+		Data:   d,
+	}
+}
+
+func PacketUnlockedFurnitureSuiteDataNotify(p *player.Player) *base.Packet {
+	code := base.UnlockedFurnitureSuiteDataNotify
+	msg := pb.UnlockedFurnitureSuiteDataNotify{
+		FurnitureSuiteIdList: *(*[]uint32)(unsafe.Pointer(&p.UnlockedFurnitureSuite)),
+		IsAll:                true,
 	}
 
 	d, err := proto.Marshal(&msg)

@@ -23,11 +23,11 @@ import (
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/utils"
 	"context"
-	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"sync"
+	"unsafe"
 )
 
 const collName = "players"
@@ -369,15 +369,9 @@ func (p *Player) GetSocialDetail() *pb.SocialDetail {
 		NameCardId:            uint32(p.NameCardID),
 		IsShowAvatar:          p.ShowAvatars,
 		ShowAvatarInfoList:    infoList,
-		ShowNameCardIdList:    make([]uint32, 0),
+		ShowNameCardIdList:    *(*[]uint32)(unsafe.Pointer(&p.ShowNameCardList)),
 		FinishAchievementNum:  uint32(p.Achievements.FinishedAchievementNum),
 		FriendEnterHomeOption: 0, // todo game home
-	}
-
-	err := copier.Copy(&p.ShowNameCardList, p.ShowNameCardList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
 	}
 
 	return prot

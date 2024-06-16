@@ -10,10 +10,10 @@ import (
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
 	"fmt"
-	"github.com/jinzhu/copier"
 	"google.golang.org/protobuf/proto"
 	"math/rand"
 	"time"
+	"unsafe"
 )
 
 func PacketPlayerDataNotify(player *player.Player) *base.Packet {
@@ -106,28 +106,19 @@ func PacketAvatarDataNotify(player *player.Player) *base.Packet {
 	msg := pb.AvatarDataNotify{
 		CurAvatarTeamId:           uint32(player.TeamManager.CurrentTeamIndex),
 		ChooseAvatarGuid:          uint64(player.TeamManager.CurrentCharacterIndex),
-		OwnedFlycloakList:         []uint32{},
-		OwnedCostumeList:          []uint32{},
-		AvatarList:                make([]*pb.AvatarInfo, 0),
+		OwnedFlycloakList:         *(*[]uint32)(unsafe.Pointer(&player.FlyCloakList)),
+		OwnedCostumeList:          *(*[]uint32)(unsafe.Pointer(&player.CostumeList)),
+		AvatarList:                make([]*pb.AvatarInfo, 0, len(player.Avatars.Avatars)),
 		AvatarTeamMap:             make(map[uint32]*pb.AvatarTeam),
 		BackupAvatarTeamOrderList: make([]uint32, 0),
 	}
-	err := copier.Copy(&msg.OwnedFlycloakList, player.FlyCloakList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
-	err = copier.Copy(&msg.OwnedCostumeList, player.CostumeList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
+
 	for _, val := range player.Avatars.Avatars {
 		msg.AvatarList = append(msg.AvatarList, val.ToProto())
 	}
 
-	for id, teamInfo := range player.TeamManager.Teams {
-		msg.AvatarTeamMap[uint32(id)] = teamInfo.ToProto()
+	for id, _ := range player.TeamManager.Teams {
+		//msg.AvatarTeamMap[uint32(id)] = teamInfo.ToProto()
 		if id > 4 {
 			// Add the id list for custom teams.
 			msg.BackupAvatarTeamOrderList = append(msg.BackupAvatarTeamOrderList, uint32(id))
@@ -353,13 +344,7 @@ func PacketWidgetGadgetAllDataNotify() *base.Packet {
 func PacketCombineDataNotify(unlockedCombines []int) *base.Packet {
 	code := base.CombineDataNotify
 	msg := pb.CombineDataNotify{
-		CombineIdList: make([]uint32, 0),
-	}
-
-	err := copier.Copy(&msg.CombineIdList, unlockedCombines)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
+		CombineIdList: *(*[]uint32)(unsafe.Pointer(&unlockedCombines)),
 	}
 
 	data, err := proto.Marshal(&msg)
@@ -378,14 +363,8 @@ func PacketGetChatEmojiCollectionRsp(emojiIds []int) *base.Packet {
 	code := base.GetChatEmojiCollectionRsp
 	msg := pb.GetChatEmojiCollectionRsp{
 		ChatEmojiCollectionData: &pb.ChatEmojiCollectionData{
-			EmojiIdList: make([]uint32, 0),
+			EmojiIdList: *(*[]uint32)(unsafe.Pointer(&emojiIds)),
 		},
-	}
-
-	err := copier.Copy(&msg.ChatEmojiCollectionData.EmojiIdList, emojiIds)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
 	}
 
 	data, err := proto.Marshal(&msg)
@@ -440,13 +419,7 @@ func PacketPlayerEnterSceneNotify(p *player.Player) *base.Packet {
 func PacketPlayerLevelRewardUpdateNotify(rewardedLevels []int) *base.Packet {
 	code := base.PlayerLevelRewardUpdateNotify
 	msg := pb.PlayerLevelRewardUpdateNotify{
-		LevelList: make([]uint32, 0),
-	}
-
-	err := copier.Copy(&msg.LevelList, rewardedLevels)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
+		LevelList: *(*[]uint32)(unsafe.Pointer(&rewardedLevels)),
 	}
 
 	data, err := proto.Marshal(&msg)

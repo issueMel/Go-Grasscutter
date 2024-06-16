@@ -56,12 +56,32 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 
 func NotifyManger(sess *session.Session) {
 	// todo INCOMPLETE: other manager send packet
-	sess.Send(resp.PacketOpenStateUpdateNotify(sess.Player))         // this.getProgressManager().onPlayerLogin();
-	sess.Send(resp.PacketAchievementAllDataNotify(sess.Player))      // Achievements
+	sess.Send(resp.PacketOpenStateUpdateNotify(sess.Player))    // this.getProgressManager().onPlayerLogin();
+	sess.Send(resp.PacketAchievementAllDataNotify(sess.Player)) // Achievements
+	sess.Send(resp.PacketForgeDataNotify())                     // forgingManager
+	sess.Send(resp.PacketResinChangeNotify(sess.Player))        // resinManager
+	sess.Send(resp.PacketCookDataNotify())                      // cookingManager
+
+	sess.Send(resp.PacketCompoundDataNotify()) // cookingCompoundManager
+	// getTodayMoonCard PacketCardProductRewardNotify
+
 	sess.Send(resp.PacketBattlePassMissionUpdateNotify(sess.Player)) // triggerMission
 
-	// onOwnerLogin
+	// furnitureManager
+	sess.Send(resp.PacketUnlockedFurnitureFormulaDataNotify(sess.Player))
+	sess.Send(resp.PacketUnlockedFurnitureSuiteDataNotify(sess.Player))
 
+	// home.onOwnerLogin
+	// PacketHomeBasicInfoNotify
+	// PacketPlayerHomeCompInfoNotify
+	// PacketHomeComfortInfoNotify
+	// PacketFurnitureCurModuleArrangeCountNotify
+	// PacketHomeMarkPointNotify
+	// PacketHomeAvatarTalkFinishInfoNotify
+	// PacketHomeAllUnlockedBgmIdListNotify
+	// PacketHomeAvatarRewardEventNotify
+	// PacketHomeAvatarAllFinishRewardNotify
+	// PacketHomeResourceNotify
 	sess.Send(resp.PacketActivityScheduleInfoNotify()) // ActivityManager
 }
 

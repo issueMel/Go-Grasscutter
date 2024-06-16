@@ -3,15 +3,15 @@ package avatar
 import (
 	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/generated/pb"
-	"Go-Grasscutter/log"
-	"github.com/jinzhu/copier"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"unsafe"
 )
 
 type Avatar struct {
 	// Equips map[int]inventory.GameItem
-	FightProperties    map[int]float32
-	FightPropOverrides map[int]float32
+	FightProperties    map[int32]float32
+	FightPropOverrides map[int32]float32
 	Id                 primitive.ObjectID `bson:"_id"`
 	OwnerId            int                `bson:"ownerId"`
 	// owner player.Player
@@ -75,12 +75,12 @@ func (a *Avatar) ToProto() *pb.AvatarInfo {
 		AvatarId:                uint32(a.AvatarId),
 		Guid:                    uint64(a.Guid),
 		LifeState:               1,
-		TalentIdList:            make([]uint32, 0),
+		TalentIdList:            *(*[]uint32)(unsafe.Pointer(&a.TalentIdList)),
 		FightPropMap:            make(map[uint32]float32),
 		SkillDepotId:            uint32(a.SkillDepotId),
 		CoreProudSkillLevel:     6, // todo getCoreProudSkillLevel()
 		SkillLevelMap:           make(map[uint32]uint32),
-		InherentProudSkillList:  make([]uint32, 0),
+		InherentProudSkillList:  *(*[]uint32)(unsafe.Pointer(&a.ProudSkillList)),
 		ProudSkillExtraLevelMap: make(map[uint32]uint32),
 		AvatarType:              uint32(a.AvatarType),
 		BornTime:                uint32(a.BornTime),
@@ -88,35 +88,21 @@ func (a *Avatar) ToProto() *pb.AvatarInfo {
 		WearingFlycloakId:       uint32(a.FlyCloak),
 		CostumeId:               uint32(a.Costume),
 	}
-
-	err := copier.Copy(&proto.TalentIdList, a.TalentIdList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
+	if a.FightProperties != nil {
+		fmt.Printf("%+v\n", a.FightProperties)
 	}
+	// todo check panic here
+	//if a.FightProperties != nil {
+	//	proto.FightPropMap = *(*map[uint32]float32)(unsafe.Pointer(&a.FightProperties))
+	//}
+	//
+	//if a.SkillLevelMap != nil {
+	//	proto.SkillLevelMap = *(*map[uint32]uint32)(unsafe.Pointer(&a.SkillLevelMap))
+	//}
+	//
+	//if a.ProudSkillBonusMap != nil {
+	//	proto.ProudSkillExtraLevelMap = *(*map[uint32]uint32)(unsafe.Pointer(&a.ProudSkillBonusMap))
+	//}
 
-	err = copier.Copy(&proto.FightPropMap, a.FightProperties)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
-
-	err = copier.Copy(&proto.SkillLevelMap, a.SkillLevelMap)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
-
-	err = copier.Copy(&proto.InherentProudSkillList, a.ProudSkillList)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
-
-	err = copier.Copy(&proto.ProudSkillExtraLevelMap, a.ProudSkillBonusMap)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
-	}
 	return proto
 }

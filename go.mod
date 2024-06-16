@@ -22,8 +22,6 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
-require github.com/jinzhu/copier v0.4.0
-
 require (
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/bytedance/gopkg v0.0.0-20220413063733-65bf48ffb3a7 // indirect

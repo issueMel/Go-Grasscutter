@@ -5,8 +5,8 @@ import (
 	"Go-Grasscutter/generated/pb"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/server/kcp/packet/base"
-	"github.com/jinzhu/copier"
 	"google.golang.org/protobuf/proto"
+	"unsafe"
 )
 
 func PacketGetSceneAreaRsp(p *player.Player, sceneId uint32) *base.Packet {
@@ -14,7 +14,7 @@ func PacketGetSceneAreaRsp(p *player.Player, sceneId uint32) *base.Packet {
 	msg := pb.GetSceneAreaRsp{
 		CityInfoList: make([]*pb.CityInfo, 0, 5),
 		SceneId:      sceneId,
-		AreaIdList:   make([]uint32, 0),
+		AreaIdList:   *(*[]uint32)(unsafe.Pointer(&p.UnlockedSceneAreas)),
 	}
 
 	for i := 1; i < 6; i++ {
@@ -22,12 +22,6 @@ func PacketGetSceneAreaRsp(p *player.Player, sceneId uint32) *base.Packet {
 		if val, ok := p.CityInfoData[i]; ok {
 			msg.CityInfoList = append(msg.CityInfoList, val.ToProto())
 		}
-	}
-
-	err := copier.Copy(&msg.AreaIdList, p.UnlockedSceneAreas)
-	if err != nil {
-		log.SugaredLogger.Error(err)
-		return nil
 	}
 
 	data, err := proto.Marshal(&msg)
