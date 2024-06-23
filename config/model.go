@@ -1,183 +1,208 @@
 package config
 
 type Config struct {
-	FolderStructure *FolderStructure `json:"folderStructure"`
-	DatabaseInfo    *DatabaseInfo    `json:"databaseInfo"`
-	Language        *Language        `json:"language"`
-	Account         *Account         `json:"account"`
-	Server          *Server          `json:"server"`
-	Dispatch        *Dispatch        `json:"dispatch"`
-	DebugMode       *DebugMode       `json:"debugMode"`
-	Version         int              `json:"version"`
+	FolderStructure *FolderStructure `json:"folderStructure,omitempty"`
+	DatabaseInfo    *DatabaseInfo    `json:"databaseInfo,omitempty"`
+	Language        *Language        `json:"language,omitempty"`
+	Account         *Account         `json:"account,omitempty"`
+	Server          *Server          `json:"server,omitempty"`
+	DebugMode       *DebugMode       `json:"debugMode,omitempty"`
+	Version         int              `json:"version,omitempty"`
 }
 
 type Server struct {
-	DebugWhitelist []interface{} `json:"debugWhitelist"`
-	DebugBlacklist []interface{} `json:"debugBlacklist"`
-	RunMode        string        `json:"runMode"`
-	LogCommands    bool          `json:"logCommands"`
-	FastRequire    bool          `json:"fastRequire"`
-	Http           *Http         `json:"http"`
-	Game           *Game         `json:"game"`
-	Dispatch       *Dispatch     `json:"dispatch"`
-	DebugMode      *DebugMode    `json:"debugMode"`
+	DebugWhitelist []interface{} `json:"debugWhitelist,omitempty"`
+	DebugBlacklist []interface{} `json:"debugBlacklist,omitempty"`
+	RunMode        string        `json:"runMode,omitempty"`
+	LogCommands    bool          `json:"logCommands,omitempty"`
+	FastRequire    bool          `json:"fastRequire,omitempty"`
+	Http           *Http         `json:"http,omitempty"`
+	Game           *Game         `json:"game,omitempty"`
+	Dispatch       *Dispatch     `json:"dispatch,omitempty"`
+	DebugMode      *DebugMode    `json:"debugMode,omitempty"`
 }
 
 type FolderStructure struct {
-	Resources string `json:"resources"`
-	Data      string `json:"data"`
-	Packets   string `json:"packets"`
-	Scripts   string `json:"scripts"`
-	Plugins   string `json:"plugins"`
-	Cache     string `json:"cache"`
+	Resources string `json:"resources,omitempty"`
+	Data      string `json:"data,omitempty"`
+	Packets   string `json:"packets,omitempty"`
+	Scripts   string `json:"scripts,omitempty"`
+	Plugins   string `json:"plugins,omitempty"`
+	Cache     string `json:"cache,omitempty"`
 }
 
-type ServerParam struct {
+type DataStore struct {
 	ConnectionUri string `json:"connectionUri"`
 	Collection    string `json:"collection"`
 }
 
 type DatabaseInfo struct {
-	Server *ServerParam `json:"server"`
-	Game   *ServerParam `json:"game"`
+	Server *DataStore `json:"server,omitempty"`
+	Game   *DataStore `json:"game,omitempty"`
 }
 
 type Language struct {
-	Language string `json:"language"`
-	Fallback string `json:"fallback"`
-	Document string `json:"document"`
+	Language string `json:"language,omitempty"`
+	Fallback string `json:"fallback,omitempty"`
+	Document string `json:"document,omitempty"`
 }
 
 type Account struct {
-	AutoCreate          bool     `json:"autoCreate"`
-	ExperimentalRealPwd bool     `json:"EXPERIMENTAL_RealPassword"`
-	DefaultPermissions  []string `json:"defaultPermissions"`
-	MaxPlayer           int      `json:"maxPlayer"`
+	AutoCreate          bool     `json:"autoCreate,omitempty"`
+	ExperimentalRealPwd bool     `json:"EXPERIMENTAL_RealPassword,omitempty"`
+	DefaultPermissions  []string `json:"defaultPermissions,omitempty"`
+	MaxPlayer           int      `json:"maxPlayer,omitempty"`
 }
 
 type Http struct {
-	StartImmediately bool   `json:"startImmediately"`
-	BindAddress      string `json:"bindAddress"`
-	BindPort         int    `json:"bindPort"`
-	AccessAddress    string `json:"accessAddress"`
-	AccessPort       int    `json:"accessPort"`
-	Encryption       struct {
-		UseEncryption    bool   `json:"useEncryption"`
-		UseInRouting     bool   `json:"useInRouting"`
-		Keystore         string `json:"keystore"`
-		KeystorePassword string `json:"keystorePassword"`
-	} `json:"encryption"`
-	Policies struct {
-		Cors struct {
-			Enabled        bool     `json:"enabled"`
-			AllowedOrigins []string `json:"allowedOrigins"`
-		} `json:"cors"`
-	} `json:"policies"`
-	Files struct {
-		IndexFile string `json:"indexFile"`
-		ErrorFile string `json:"errorFile"`
-	} `json:"files"`
+	StartImmediately bool        `json:"startImmediately,omitempty"`
+	BindAddress      string      `json:"bindAddress,omitempty"`
+	BindPort         int         `json:"bindPort,omitempty"`
+	AccessAddress    string      `json:"accessAddress,omitempty"`
+	AccessPort       int         `json:"accessPort,omitempty"`
+	Encryption       *Encryption `json:"encryption,omitempty"`
+	Policies         *Policies   `json:"policies,omitempty"`
+	Files            *Files      `json:"files,omitempty"`
+}
+
+type Encryption struct {
+	UseEncryption    bool   `json:"useEncryption,omitempty"`
+	UseInRouting     bool   `json:"useInRouting,omitempty"`
+	Keystore         string `json:"keystore,omitempty"`
+	KeystorePassword string `json:"keystorePassword,omitempty"`
+}
+
+type Policies struct {
+	Cors struct {
+		Enabled        bool     `json:"enabled,omitempty"`
+		AllowedOrigins []string `json:"allowedOrigins,omitempty"`
+	} `json:"cors"`
+}
+
+type Files struct {
+	IndexFile string `json:"indexFile,omitempty"`
+	ErrorFile string `json:"errorFile,omitempty"`
 }
 
 type Game struct {
-	BindAddress                string `json:"bindAddress"`
-	BindPort                   int    `json:"bindPort"`
-	AccessAddress              string `json:"accessAddress"`
-	AccessPort                 int    `json:"accessPort"`
-	UseUniquePacketKey         bool   `json:"useUniquePacketKey"`
-	LoadEntitiesForPlayerRange int    `json:"loadEntitiesForPlayerRange"`
-	EnableScriptInBigWorld     bool   `json:"enableScriptInBigWorld"`
-	EnableConsole              bool   `json:"enableConsole"`
-	KcpInterval                int    `json:"kcpInterval"`
-	LogPackets                 string `json:"logPackets"`
-	IsShowPacketPayload        bool   `json:"isShowPacketPayload"`
-	IsShowLoopPackets          bool   `json:"isShowLoopPackets"`
-	CacheSceneEntitiesEveryRun bool   `json:"cacheSceneEntitiesEveryRun"`
-	GameOptions                struct {
-		InventoryLimits struct {
-			Weapons   int `json:"weapons"`
-			Relics    int `json:"relics"`
-			Materials int `json:"materials"`
-			Furniture int `json:"furniture"`
-			All       int `json:"all"`
-		} `json:"inventoryLimits"`
-		AvatarLimits struct {
-			SinglePlayerTeam int `json:"singlePlayerTeam"`
-			MultiplayerTeam  int `json:"multiplayerTeam"`
-		} `json:"avatarLimits"`
-		SceneEntityLimit int  `json:"sceneEntityLimit"`
-		WatchGachaConfig bool `json:"watchGachaConfig"`
-		EnableShopItems  bool `json:"enableShopItems"`
-		StaminaUsage     bool `json:"staminaUsage"`
-		EnergyUsage      bool `json:"energyUsage"`
-		FishhookTeleport bool `json:"fishhookTeleport"`
-		TrialCostumes    bool `json:"trialCostumes"`
-		Questing         struct {
-			Enabled bool `json:"enabled"`
-		} `json:"questing"`
-		ResinOptions struct {
-			ResinUsage   bool `json:"resinUsage"`
-			Cap          int  `json:"cap"`
-			RechargeTime int  `json:"rechargeTime"`
-		} `json:"resinOptions"`
-		Rates struct {
-			AdventureExp float64 `json:"adventureExp"`
-			Mora         float64 `json:"mora"`
-			LeyLines     float64 `json:"leyLines"`
-		} `json:"rates"`
-		Handbook struct {
-			Enable        bool `json:"enable"`
-			AllowCommands bool `json:"allowCommands"`
-			Limits        struct {
-				Enabled     bool `json:"enabled"`
-				Interval    int  `json:"interval"`
-				MaxRequests int  `json:"maxRequests"`
-				MaxEntities int  `json:"maxEntities"`
-			} `json:"limits"`
-			Server struct {
-				Enforced  bool   `json:"enforced"`
-				Address   string `json:"address"`
-				Port      int    `json:"port"`
-				CanChange bool   `json:"canChange"`
-			} `json:"server"`
-		} `json:"handbook"`
-	} `json:"gameOptions"`
-	JoinOptions struct {
-		WelcomeEmotes  []int  `json:"welcomeEmotes"`
-		WelcomeMessage string `json:"welcomeMessage"`
-		WelcomeMail    struct {
-			Title   string `json:"title"`
-			Content string `json:"content"`
-			Sender  string `json:"sender"`
-			Items   []struct {
-				ItemId    int `json:"itemId"`
-				ItemCount int `json:"itemCount"`
-				ItemLevel int `json:"itemLevel"`
-			} `json:"items"`
-		} `json:"welcomeMail"`
-	} `json:"joinOptions"`
-	ServerAccount struct {
-		AvatarId      int    `json:"avatarId"`
-		NameCardId    int    `json:"nameCardId"`
-		AdventureRank int    `json:"adventureRank"`
-		WorldLevel    int    `json:"worldLevel"`
-		NickName      string `json:"nickName"`
-		Signature     string `json:"signature"`
-	} `json:"serverAccount"`
-	VisionOptions []struct {
-		Name        string `json:"name"`
-		VisionRange int    `json:"visionRange"`
-		GridWidth   int    `json:"gridWidth"`
-	} `json:"visionOptions"`
+	BindAddress                string           `json:"bindAddress,omitempty"`
+	BindPort                   int              `json:"bindPort,omitempty"`
+	AccessAddress              string           `json:"accessAddress,omitempty"`
+	AccessPort                 int              `json:"accessPort,omitempty"`
+	UseUniquePacketKey         bool             `json:"useUniquePacketKey,omitempty"`
+	LoadEntitiesForPlayerRange int              `json:"loadEntitiesForPlayerRange,omitempty"`
+	EnableScriptInBigWorld     bool             `json:"enableScriptInBigWorld,omitempty"`
+	EnableConsole              bool             `json:"enableConsole,omitempty"`
+	KcpInterval                int              `json:"kcpInterval,omitempty"`
+	LogPackets                 string           `json:"logPackets,omitempty"`
+	IsShowPacketPayload        bool             `json:"isShowPacketPayload,omitempty"`
+	IsShowLoopPackets          bool             `json:"isShowLoopPackets,omitempty"`
+	CacheSceneEntitiesEveryRun bool             `json:"cacheSceneEntitiesEveryRun,omitempty"`
+	GameOptions                *GameOptions     `json:"gameOptions,omitempty"`
+	JoinOptions                *JoinOptions     `json:"joinOptions,omitempty"`
+	ServerAccount              *ServerAccount   `json:"serverAccount,omitempty"`
+	VisionOptions              []*VisionOptions `json:"visionOptions,omitempty"`
+}
+
+type GameOptions struct {
+	InventoryLimits  *InventoryLimits `json:"inventoryLimits,omitempty"`
+	AvatarLimits     *AvatarLimits    `json:"avatarLimits,omitempty"`
+	SceneEntityLimit int              `json:"sceneEntityLimit,omitempty"`
+	WatchGachaConfig bool             `json:"watchGachaConfig,omitempty"`
+	EnableShopItems  bool             `json:"enableShopItems,omitempty"`
+	StaminaUsage     bool             `json:"staminaUsage,omitempty"`
+	EnergyUsage      bool             `json:"energyUsage,omitempty"`
+	FishhookTeleport bool             `json:"fishhookTeleport,omitempty"`
+	TrialCostumes    bool             `json:"trialCostumes,omitempty"`
+	Questing         *Questing        `json:"questing,omitempty"`
+	ResinOptions     *ResinOptions    `json:"resinOptions,omitempty"`
+	Rates            *Rates           `json:"rates,omitempty"`
+	Handbook         *Handbook        `json:"handbook,omitempty"`
+}
+
+type JoinOptions struct {
+	WelcomeEmotes  []int  `json:"welcomeEmotes,omitempty"`
+	WelcomeMessage string `json:"welcomeMessage,omitempty"`
+	WelcomeMail    struct {
+		Title   string `json:"title,omitempty"`
+		Content string `json:"content,omitempty"`
+		Sender  string `json:"sender,omitempty"`
+		Items   []struct {
+			ItemId    int `json:"itemId,omitempty"`
+			ItemCount int `json:"itemCount,omitempty"`
+			ItemLevel int `json:"itemLevel,omitempty"`
+		} `json:"items,omitempty"`
+	} `json:"welcomeMail,omitempty"`
+}
+
+type ServerAccount struct {
+	AvatarId      int    `json:"avatarId,omitempty"`
+	NameCardId    int    `json:"nameCardId,omitempty"`
+	AdventureRank int    `json:"adventureRank,omitempty"`
+	WorldLevel    int    `json:"worldLevel,omitempty"`
+	NickName      string `json:"nickName,omitempty"`
+	Signature     string `json:"signature,omitempty"`
+}
+
+type VisionOptions []struct {
+	Name        string `json:"name,omitempty"`
+	VisionRange int    `json:"visionRange,omitempty"`
+	GridWidth   int    `json:"gridWidth,omitempty"`
+}
+
+type AvatarLimits struct {
+	SinglePlayerTeam int `json:"singlePlayerTeam,omitempty"`
+	MultiplayerTeam  int `json:"multiplayerTeam,omitempty"`
+}
+
+type InventoryLimits struct {
+	Weapons   int `json:"weapons"`
+	Relics    int `json:"relics"`
+	Materials int `json:"materials"`
+	Furniture int `json:"furniture"`
+	All       int `json:"all"`
+}
+
+type Questing struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type ResinOptions struct {
+	ResinUsage   bool `json:"resinUsage"`
+	Cap          int  `json:"cap"`
+	RechargeTime int  `json:"rechargeTime"`
+}
+
+type Rates struct {
+	AdventureExp float64 `json:"adventureExp,omitempty"`
+	Mora         float64 `json:"mora,omitempty"`
+	LeyLines     float64 `json:"leyLines,omitempty"`
+}
+
+type Handbook struct {
+	Enable        bool `json:"enable,omitempty"`
+	AllowCommands bool `json:"allowCommands,omitempty"`
+	Limits        struct {
+		Enabled     bool `json:"enabled,omitempty"`
+		Interval    int  `json:"interval,omitempty"`
+		MaxRequests int  `json:"maxRequests,omitempty"`
+		MaxEntities int  `json:"maxEntities,omitempty"`
+	} `json:"limits,omitempty"`
+	Server struct {
+		Enforced  bool   `json:"enforced,omitempty"`
+		Address   string `json:"address,omitempty"`
+		Port      int    `json:"port,omitempty"`
+		CanChange bool   `json:"canChange,omitempty"`
+	} `json:"server,omitempty"`
 }
 
 type Dispatch struct {
 	Regions       []*Region `json:"regions"`
-	DispatchUrl   string    `json:"dispatchUrl"`
-	EncryptionKey string    `json:"encryptionKey"`
-	DispatchKey   string    `json:"dispatchKey"`
+	DispatchUrl   string    `json:"dispatchUrl,omitempty"`
+	EncryptionKey string    `json:"encryptionKey,omitempty"`
+	DispatchKey   string    `json:"dispatchKey,omitempty"`
 	DefaultName   string    `json:"defaultName"`
-	LogRequests   string    `json:"logRequests"`
+	LogRequests   string    `json:"logRequests,omitempty"`
 }
 
 type Region struct {
