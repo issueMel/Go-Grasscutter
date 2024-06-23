@@ -91,7 +91,6 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 	// Set player object for session
 	sess.Player = p
 
-	// todo INCOMPLETE: Load player from database
 	sess.Player.LoadFromDatabase()
 
 	// Set session state
@@ -131,7 +130,7 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 		rsp := resp.PacketGetPlayerTokenRsp(sess, utils.Base64Encode(seedEncrypted), utils.Base64Encode(signature))
 		sess.Send(rsp)
 	} else {
-		// todo INCOMPLETE: Send packet
+		sess.Send(resp.PacketGetPlayerTokenNormalRsp(sess))
 	}
 }
 
