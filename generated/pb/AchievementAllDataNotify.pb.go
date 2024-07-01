@@ -145,7 +145,7 @@ func file_proto_AchievementAllDataNotify_proto_init() {
 	if File_proto_AchievementAllDataNotify_proto != nil {
 		return
 	}
-	file_proto_Achievement_proto_init()
+	file_Achievement_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_proto_AchievementAllDataNotify_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*AchievementAllDataNotify); i {

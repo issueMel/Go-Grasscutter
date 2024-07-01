@@ -2,6 +2,7 @@ package data
 
 import (
 	"Go-Grasscutter/data/excels"
+	"Go-Grasscutter/data/excels/achievement"
 	"Go-Grasscutter/data/excels/avatar"
 	"Go-Grasscutter/data/excels/quest"
 	"Go-Grasscutter/data/excels/scene"
@@ -22,6 +23,7 @@ func init() {
 		ScenePointIdList:    make([]int, 0),
 		ScenePointsPerScene: make(map[int][]int),
 		ScenePointEntryMap:  make(map[int]*ScenePointEntry),
+		AchievementDataMap:  achievement.LoadAchievementData(),
 	}
 	loadScenePoints()
 }
@@ -37,4 +39,6 @@ type Data struct {
 	ScenePointIdList         []int
 	ScenePointsPerScene      map[int][]int
 	ScenePointEntryMap       map[int]*ScenePointEntry
+
+	AchievementDataMap map[int]*achievement.Data
 }
