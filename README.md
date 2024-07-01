@@ -7,7 +7,7 @@ this project is imitate [Grasscutter](https://github.com/Grasscutters/Grasscutte
 
 ## Current features
 
-- [x] Login
+- [x] Login (incomplete)
 - [ ] Combat
 - [ ] Friends list
 - [ ] Teleportation
@@ -52,16 +52,6 @@ cd Go-Grasscutter
 
 ```shell
 go build Go-Grasscutter
-```
-
-##### Compiling the Handbook (Manually)
-
-With NPM:
-
-```shell
-cd src/handbook
-npm install
-npm run build
 ```
 
 You can find the output program in the root of the project folder.

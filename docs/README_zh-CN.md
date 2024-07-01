@@ -52,16 +52,6 @@ cd Go-Grasscutter
 go build Go-Grasscutter
 ```
 
-##### Compiling the Handbook (Manually)
-
-With NPM:
-
-```shell
-cd src/handbook
-npm install
-npm run build
-```
-
 你可以在项目的根目录找到编译好的程序。
 
 ## Contribute
