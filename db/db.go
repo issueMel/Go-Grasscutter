@@ -1,6 +1,7 @@
 package db
 
 import (
+	"Go-Grasscutter/config"
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -9,7 +10,7 @@ import (
 var DB *mongo.Database
 
 func InitDatabase() {
-	uri := "mongodb://localhost:27017"
+	uri := config.Conf.DatabaseInfo.Server.ConnectionUri
 	// Use the SetServerAPIOptions() method to set the Stable API version to 1
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
@@ -18,5 +19,6 @@ func InitDatabase() {
 	if err != nil {
 		panic(err)
 	}
-	DB = client.Database("grasscutter")
+	collection := config.Conf.DatabaseInfo.Server.Collection
+	DB = client.Database(collection)
 }

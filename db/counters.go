@@ -6,7 +6,10 @@ import (
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+const collName = "counters"
 
 type Counter struct {
 	ID    string `bson:"_id"`
@@ -14,7 +17,8 @@ type Counter struct {
 }
 
 func (c *Counter) save() {
-	_, err := DB.Collection("counters").InsertOne(context.Background(), c)
+	opts := options.Update().SetUpsert(true)
+	_, err := DB.Collection(collName).UpdateOne(context.Background(), bson.D{{"_id", c.ID}}, c, opts)
 	if err != nil {
 		log.SugaredLogger.Error(err)
 		return

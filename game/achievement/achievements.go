@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const collName = "achievements"
@@ -63,7 +64,8 @@ func listInit() map[int]*Achievement {
 }
 
 func (a *Achievements) save() {
-	_, err := db.DB.Collection(collName).InsertOne(context.Background(), a)
+	opts := options.Update().SetUpsert(true)
+	_, err := db.DB.Collection(collName).UpdateOne(context.Background(), bson.D{{"uid", a.Uid}}, a, opts)
 	if err != nil {
 		log.SugaredLogger.Error(err)
 		return
