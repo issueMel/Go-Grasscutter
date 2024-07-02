@@ -36,7 +36,7 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 
 	// Check the account.
 	if account == nil {
-		sess.Tunnel.Close()
+		sess.Tunnel.Kcp.Close()
 		return
 	}
 
@@ -50,10 +50,10 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 	val, exist := game.Server.Players.Load(account.ID)
 	if exist {
 		p := val.(player.Player)
-		if p.Session != sess.Tunnel { // No self-kicking
+		if p.Tunnel != sess.Tunnel { // No self-kicking
 			// must save immediately , or the below will load old data
 			p.Save()
-			p.Session.Close()
+			p.Tunnel.Kcp.Close()
 			log.SugaredLogger.Infof("Player %s was kicked due to duplicated login\n", p.Account.Username)
 			kicked = true
 		}
@@ -66,7 +66,7 @@ func HandlerGetPlayerTokenReq(sess *session.Session, header, payload []byte) {
 		// Max players limit
 		maxPlayer := config.Conf.Account.MaxPlayer
 		if maxPlayer > -1 && game.Server.PlayerNum.Load() > int32(maxPlayer) {
-			sess.Tunnel.Close()
+			sess.Tunnel.Kcp.Close()
 			log.SugaredLogger.Info("max players limit")
 			return
 		}

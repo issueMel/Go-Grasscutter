@@ -16,10 +16,10 @@ var Management sync.Map // *UDPSession, *Session
 
 func (s *Session) Connected() {
 	conn := s.Tunnel
-	conn.SetNoDelay(1, config.Conf.Server.Game.KcpInterval, 2, 1)
-	conn.SetMtu(1400)
-	conn.SetWindowSize(256, 256)
-	conn.SetACKNoDelay(true)
+	conn.Kcp.SetNoDelay(1, config.Conf.Server.Game.KcpInterval, 2, 1)
+	conn.Kcp.SetMtu(1400)
+	conn.Kcp.SetWindowSize(256, 256)
+	conn.Kcp.SetACKNoDelay(true)
 	// conn.SetDeadline(time.Now().Add(30 * time.Second))
 	var buffer = make([]byte, 4096)
 
@@ -31,10 +31,10 @@ func (s *Session) Connected() {
 	//	runtime.GC() // todo limit gc times at per second
 	//}()
 	for {
-		n, e := conn.Read(buffer)
+		n, e := conn.Kcp.Read(buffer)
 		if e != nil {
 			if errors.Is(e, io.ErrClosedPipe) {
-				log.SugaredLogger.Infof(lang.Translate("messages.game.disconnect"), conn.RemoteAddr())
+				log.SugaredLogger.Infof(lang.Translate("messages.game.disconnect"), conn.Kcp.RemoteAddr())
 				return
 			}
 			log.SugaredLogger.Error(e)
@@ -48,7 +48,7 @@ func (s *Session) handleReceive(buffer []byte) {
 	var buf *bytes.Buffer
 	// Decrypt and turn back into a packet
 	if s.UseSecretKey {
-		buf = bytes.NewBuffer(crypto.Xor(buffer, s.EncryptKey))
+		buf = bytes.NewBuffer(crypto.Xor(buffer, s.Tunnel.EncryptKey))
 	} else {
 		buf = bytes.NewBuffer(crypto.Xor(buffer, crypto.DispatchKey))
 	}
@@ -100,7 +100,21 @@ func (s *Session) handleReceive(buffer []byte) {
 			break // Bad packet
 		}
 		// Handle
+		if _, ok := dontHandle[int(opcode)]; ok {
+			return
+		}
 		log.SugaredLogger.Info("handle: ", opcode)
 		Handle(s, opcode, header, payload)
+	}
+}
+
+var dontHandle = make(map[int]struct{})
+
+func init() {
+	add(27557, 20100, 6144, 2030)
+}
+func add(num ...int) {
+	for _, n := range num {
+		dontHandle[n] = struct{}{}
 	}
 }

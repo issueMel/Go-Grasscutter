@@ -4,6 +4,7 @@ import (
 	"Go-Grasscutter/data"
 	"Go-Grasscutter/db"
 	"Go-Grasscutter/game/achievement"
+	"Go-Grasscutter/game/activity"
 	"Go-Grasscutter/game/avatar"
 	"Go-Grasscutter/game/battlepass"
 	"Go-Grasscutter/game/city"
@@ -17,15 +18,16 @@ import (
 	"Go-Grasscutter/game/pros"
 	"Go-Grasscutter/game/quest"
 	"Go-Grasscutter/game/shop"
+	"Go-Grasscutter/game/tunnel"
 	"Go-Grasscutter/game/world"
 	"Go-Grasscutter/generated/pb"
-	"Go-Grasscutter/lib/kcp-go"
 	"Go-Grasscutter/log"
 	"Go-Grasscutter/utils"
 	"context"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"sync"
 )
 
@@ -33,9 +35,9 @@ const collName = "players"
 
 type Player struct {
 	ID               int    `bson:"_id"`
-	AccountID        string `bson:"accountId" index:"unique"`
+	AccountID        string `bson:"accountId"`
 	Account          *Account
-	Session          *kcp.UDPSession
+	Tunnel           *tunnel.Tunnel
 	SessionKey       string
 	Nickname         string          `bson:"nickname"`
 	Signature        string          `bson:"signature"`
@@ -99,6 +101,7 @@ type Player struct {
 	Inventory         *inventory.Inventory
 	QuestManager      *quest.Manager
 	BattlePassManager *battlepass.Manager
+	ActivityManager   *activity.Manager
 
 	// Manager data (Save-able to the database)
 	Achievements          *achievement.Achievements
@@ -142,11 +145,11 @@ func NewPlayer() *Player {
 }
 
 // Create
-func CreatePlayer(account *Account, sess *kcp.UDPSession) *Player {
+func CreatePlayer(account *Account, tunnel *tunnel.Tunnel) *Player {
 	p := &Player{
 		Account:   account,
 		AccountID: account.ID,
-		Session:   sess,
+		Tunnel:    tunnel,
 		Nickname:  "Traveler",
 		Signature: "",
 	}
@@ -170,16 +173,17 @@ func (p *Player) LoadFromDatabase() {
 	if p.PlayerProfile == nil || p.PlayerProfile.Uid == 0 {
 		// syncWithCharacter
 		p.PlayerProfile = &friends.PlayerProfile{
-			Uid:       p.ID,
-			NameCard:  p.NameCardID,
-			AvatarId:  p.HeadImage,
-			Name:      p.Nickname,
-			Signature: p.Signature,
-			//PlayerLevel:      ,
-			//WorldLevel:       ,
+			Uid:             p.ID,
+			NameCard:        p.NameCardID,
+			AvatarId:        p.HeadImage,
+			Name:            p.Nickname,
+			Signature:       p.Signature,
+			PlayerLevel:     p.GetLevel(),
+			WorldLevel:      p.GetWorldLevel(),
 			LastActiveTime:  utils.GetCurrentSeconds(),
-			EnterHomeOption: 0, // todo INCOMPLETE
+			EnterHomeOption: 1, // todo INCOMPLETE
 		}
+
 	}
 	// todo INCOMPLETE: Load all Player managers From Database
 	// Load from db
@@ -328,7 +332,8 @@ func (p *Player) GeneratePlayerUid(reservedId int) {
 }
 
 func (p *Player) Save() {
-	_, err := db.DB.Collection(collName).InsertOne(context.Background(), p)
+	opts := options.Update().SetUpsert(true)
+	_, err := db.DB.Collection(collName).UpdateOne(context.Background(), bson.D{{"id", p.ID}}, p, opts)
 	if err != nil {
 		log.SugaredLogger.Error(err)
 		return
@@ -389,5 +394,5 @@ func (p *Player) GetLevel() int {
 
 func (p *Player) isOnline() bool {
 	// todo session.isActive()
-	return p.Session != nil
+	return p.Tunnel != nil
 }

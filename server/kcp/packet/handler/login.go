@@ -16,7 +16,7 @@ func init() {
 func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 	// Check
 	if sess.Account == nil {
-		sess.Tunnel.Close()
+		sess.Tunnel.Kcp.Close()
 		return
 	}
 
@@ -30,7 +30,7 @@ func HandlerPlayerLoginReq(sess *session.Session, header, payload []byte) {
 
 	// Authenticate session
 	if req.Token != sess.Account.Token {
-		sess.Tunnel.Close()
+		sess.Tunnel.Kcp.Close()
 		return
 	}
 
@@ -65,6 +65,8 @@ func NotifyManger(sess *session.Session) {
 	sess.Send(resp.PacketCompoundDataNotify()) // cookingCompoundManager
 	// getTodayMoonCard PacketCardProductRewardNotify
 
+	// todo getQuestManager().onLogin()
+
 	sess.Send(resp.PacketBattlePassMissionUpdateNotify(sess.Player)) // triggerMission
 
 	// furnitureManager
@@ -83,6 +85,7 @@ func NotifyManger(sess *session.Session) {
 	// PacketHomeAvatarAllFinishRewardNotify
 	// PacketHomeResourceNotify
 	sess.Send(resp.PacketActivityScheduleInfoNotify()) // ActivityManager
+	temp(sess)
 }
 
 func NotifyLogin(sess *session.Session) {

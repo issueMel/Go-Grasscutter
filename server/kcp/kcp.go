@@ -25,7 +25,7 @@ func Init() {
 			go s.(*session.Session).Connected()
 		} else {
 			sess := session.NewGameSession()
-			sess.Tunnel = conn
+			sess.Tunnel.Kcp = conn
 			session.Management.Store(conn, sess)
 			go sess.Connected()
 		}
